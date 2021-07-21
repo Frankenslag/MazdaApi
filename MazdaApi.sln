@@ -1,0 +1,43 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.31424.327
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MazdaApiTestClient", "MazdaApiTestClient\MazdaApiTestClient.csproj", "{94B6EFBE-CD7D-4D92-8C45-2BAA69876BF6}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MazdaApiLib", "MazdaApiLib\MazdaApiLib.csproj", "{DD6BB48F-407F-441B-93A0-9B3E8294F262}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SensorDataLib", "SensorDataLib\SensorDataLib.csproj", "{6C7E8B9E-234B-440E-BCD3-26F2EAFA5753}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CryptoLib", "CryptoUtilsLib\CryptoLib.csproj", "{13555B73-AC7F-4B6E-9CBA-E519643E911E}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{94B6EFBE-CD7D-4D92-8C45-2BAA69876BF6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{94B6EFBE-CD7D-4D92-8C45-2BAA69876BF6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{94B6EFBE-CD7D-4D92-8C45-2BAA69876BF6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{94B6EFBE-CD7D-4D92-8C45-2BAA69876BF6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DD6BB48F-407F-441B-93A0-9B3E8294F262}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DD6BB48F-407F-441B-93A0-9B3E8294F262}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DD6BB48F-407F-441B-93A0-9B3E8294F262}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DD6BB48F-407F-441B-93A0-9B3E8294F262}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6C7E8B9E-234B-440E-BCD3-26F2EAFA5753}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6C7E8B9E-234B-440E-BCD3-26F2EAFA5753}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6C7E8B9E-234B-440E-BCD3-26F2EAFA5753}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6C7E8B9E-234B-440E-BCD3-26F2EAFA5753}.Release|Any CPU.Build.0 = Release|Any CPU
+		{13555B73-AC7F-4B6E-9CBA-E519643E911E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{13555B73-AC7F-4B6E-9CBA-E519643E911E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{13555B73-AC7F-4B6E-9CBA-E519643E911E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{13555B73-AC7F-4B6E-9CBA-E519643E911E}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {122E9BFC-5944-43F6-8315-927244303E90}
+	EndGlobalSection
+EndGlobal
