@@ -1,6 +1,4 @@
-﻿using System.Threading.Tasks;
-
-using WingandPrayer.MazdaApi.Exceptions;
+﻿using WingandPrayer.MazdaApi.Exceptions;
 
 namespace WingandPrayer.MazdaApi
 {

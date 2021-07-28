@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Linq;
-using System.Xml.Xsl;
 using Microsoft.Extensions.Configuration;
 using WingandPrayer.MazdaApi;
-using WingandPrayer.MazdaApi.SensorData;
+using WingandPrayer.MazdaApi.Model;
+using WingandPrayer.MazdaApi.RawModel;
 
 namespace Wingandprayer.MazdaApi
 {
@@ -18,11 +18,9 @@ namespace Wingandprayer.MazdaApi
             {
                 MazdaApiClient client = new(email, secret, region);
 
-                MazdaApiVehicles v = client.GetVehicles().Result;
-
-                foreach (var i in v.VecBaseInfos)
+                foreach (VehicleModel i in client.GetVehicles().Result)
                 {
-                    Console.WriteLine(i.Vehicle.Id);
+                    var vs = client.GetVehicleStatus(i.Id).Result;
                 }
             }
 
