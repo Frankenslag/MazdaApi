@@ -1,0 +1,20 @@
+﻿<wpf:ResourceDictionary xml:space="preserve" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:s="clr-namespace:System;assembly=mscorlib" xmlns:ss="urn:shemas-jetbrains-com:settings-storage-xaml" xmlns:wpf="http://schemas.microsoft.com/winfx/2006/xaml/presentation">
+	<s:String x:Key="/Default/CodeStyle/FileHeader/FileHeaderText/@EntryValue">// &#xD;
+// $FILENAME$&#xD;
+// &#xD;
+// Copyright $CURRENT_YEAR$ Wingandprayer Software&#xD;
+// &#xD;
+// This file is part of MazdaApiLib.&#xD;
+// &#xD;
+// MazdaApiLib is free software: you can redistribute it and/or modify it under the terms of the&#xD;
+// GNU General Public License as published by the Free Software Foundation, either version 2&#xD;
+// of the License, or (at your option) any later version.&#xD;
+// &#xD;
+// CDRipper is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;&#xD;
+// without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR&#xD;
+// PURPOSE. See the GNU General Public License for more details.&#xD;
+// &#xD;
+// You should have received a copy of the GNU General Public License along with MazdaApiLib.&#xD;
+// If not, see http://www.gnu.org/licenses/.&#xD;
+// &#xD;
+</s:String></wpf:ResourceDictionary>
