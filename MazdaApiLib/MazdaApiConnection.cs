@@ -18,19 +18,13 @@
 // //
 
 using System;
-using System.Buffers.Text;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Collections.Specialized;
-using System.ComponentModel.DataAnnotations;
-using System.Formats.Asn1;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Json;
-using System.Runtime.CompilerServices;
 using System.Security.Cryptography;
-using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
@@ -42,6 +36,9 @@ using WingandPrayer.MazdaApi.Exceptions;
 using WingandPrayer.MazdaApi.SensorData;
 using JsonSerializer = System.Text.Json.JsonSerializer;
 
+// ReSharper disable UnusedAutoPropertyAccessor.Local
+// ReSharper disable ClassNeverInstantiated.Local
+
 namespace WingandPrayer.MazdaApi
 {
     internal class MazdaApiConnection
@@ -49,76 +46,76 @@ namespace WingandPrayer.MazdaApi
 
         private class EncryptionKeyResponseData
         {
-            public string PublicKey { get; set; }
+            public string PublicKey { get; init; }
 
-            public string VersionPrefix { get; set; }
+            public string VersionPrefix { get; init; }
         }
 
         private class EncryptionKeyResponse
         {
-            public EncryptionKeyResponseData  Data { get; set; }
+            public EncryptionKeyResponseData  Data { get; init; }
         }
 
         private class LoginRequest
         {
             [JsonPropertyName("appId")]
-            public string AppId { get; set; }
+            public string AppId { get; init; }
             [JsonPropertyName("deviceId")]
-            public string DeviceId { get; set; }
+            public string DeviceId { get; init; }
             [JsonPropertyName("locale")]
-            public string Locale { get; set; }
+            public string Locale { get; init; }
             [JsonPropertyName("password")]
-            public string Password { get; set; }
+            public string Password { get; init; }
             [JsonPropertyName("sdkVersion")]
-            public string SdkVersion { get; set; }
+            public string SdkVersion { get; init; }
             [JsonPropertyName("userId")]
-            public string UserId { get; set; }
+            public string UserId { get; init; }
             [JsonPropertyName("userIdType")]
-            public string UserIdType { get; set; }
+            public string UserIdType { get; init; }
         }
 
         private class LoginResponseData
         {
-            public string AccessToken { get; set; }
-            public long AccessTokenExpirationTs { get; set; }
+            public string AccessToken { get; init; }
+            public long AccessTokenExpirationTs { get; init; }
         }
 
 
         private class LoginResponse
         {
-            public string Status { get; set; }
-            public LoginResponseData Data { get; set; }
+            public string Status { get; init; }
+            public LoginResponseData Data { get; init; }
         }
 
         private class ApiResponse
         {
-            public string State { get; set; }
-            public string Error { get; set; }
-            public int ErrorCode { get; set; }
-            public string ExtraCode { get; set; }
-            public string Payload { get; set; }
+            public string State { get; init; }
+            public string Error { get; init; }
+            public int ErrorCode { get; init; }
+            public string ExtraCode { get; init; }
+            public string Payload { get; init; }
         }
 
         private class CheckVersionResponse
         {
-            public string EncKey { get; set; }
-            public string SignKey { get; set; }
+            public string EncKey { get; init; }
+            public string SignKey { get; init; }
         }
 
 
 
         private class RegionConfig
         {
-            public string ApplicationCode { get; set; }
-            public Uri BaseUrl { get; set; }
-            public Uri UsherUrl { get; set; }
+            public string ApplicationCode { get; init; }
+            public Uri BaseUrl { get; init; }
+            public Uri UsherUrl { get; init; }
         }
 
-        private static Dictionary<string, RegionConfig> RegionsConfigs = new Dictionary<string, RegionConfig>()
+        private static readonly Dictionary<string, RegionConfig> RegionsConfigs = new()
         {
-            {"MNAO", new RegionConfig() {ApplicationCode = "202007270941270111799", BaseUrl = new Uri("https://0cxo7m58.mazda.com/prod"), UsherUrl = new Uri("https://ptznwbh8.mazda.com/appapi/v1")}},
-            {"MME", new RegionConfig() {ApplicationCode = "202008100250281064816", BaseUrl = new Uri("https://e9stj7g7.mazda.com/prod"), UsherUrl = new Uri("https://rz97suam.mazda.com/appapi/v1")}},
-            {"MJO", new RegionConfig() {ApplicationCode = "202009170613074283422", BaseUrl = new Uri("https://wcs9p6wj.mazda.com/prod"), UsherUrl = new Uri("https://c5ulfwxr.mazda.com/appapi/v1")}}
+            {"MNAO", new RegionConfig {ApplicationCode = "202007270941270111799", BaseUrl = new Uri("https://0cxo7m58.mazda.com/prod"), UsherUrl = new Uri("https://ptznwbh8.mazda.com/appapi/v1")}},
+            {"MME", new RegionConfig {ApplicationCode = "202008100250281064816", BaseUrl = new Uri("https://e9stj7g7.mazda.com/prod"), UsherUrl = new Uri("https://rz97suam.mazda.com/appapi/v1")}},
+            {"MJO", new RegionConfig {ApplicationCode = "202009170613074283422", BaseUrl = new Uri("https://wcs9p6wj.mazda.com/prod"), UsherUrl = new Uri("https://c5ulfwxr.mazda.com/appapi/v1")}}
         };
 
         private const string AppOs = "Android";
@@ -131,11 +128,11 @@ namespace WingandPrayer.MazdaApi
         private const string UserAgentUsherApi = "MyMazda/7.3.0 (Google Pixel 3a; Android 11)";
         private const int MaxRetries = 4;
 
-        private RegionConfig _regionConfig;
-        private string _baseApiDeviceId;
-        private string _usherApiDeviceId;
-        private string _emailAddress;
-        private string _usherApiPassword;
+        private readonly RegionConfig _regionConfig;
+        private readonly string _baseApiDeviceId;
+        private readonly string _usherApiDeviceId;
+        private readonly string _emailAddress;
+        private readonly string _usherApiPassword;
         private string _accessToken;
         private DateTime _accessTokenExpirationTs;
         private string _encKey;
@@ -161,9 +158,9 @@ namespace WingandPrayer.MazdaApi
             }
         }
 
-        private static string HexDigest(byte[] ary) => ary.Aggregate("", (current, next) => $"{current}{next:X2}");
+        private static string HexDigest(IEnumerable<byte> ary) => ary.Aggregate("", (current, next) => $"{current}{next:X2}");
 
-        private string GetPayloadSign(string payload, string signKey)
+        private static string GetPayloadSign(string payload, string signKey)
         {
             using SHA256 encoder256 = SHA256.Create();
             return HexDigest(encoder256.ComputeHash(Encoding.UTF8.GetBytes(payload + signKey))).ToUpper();
@@ -172,7 +169,7 @@ namespace WingandPrayer.MazdaApi
         private string GetSignFromTimestamp(long timestamp)
         {
             string strTimestamp = timestamp.ToString();
-            string strTimestampExtended = strTimestamp + strTimestamp.Substring(6) + strTimestamp.Substring(3);
+            string strTimestampExtended = strTimestamp + strTimestamp[6..] + strTimestamp[3..];
             string val2;
 
             using (MD5 md5 = MD5.Create())
@@ -180,7 +177,7 @@ namespace WingandPrayer.MazdaApi
                 val2 = HexDigest(md5.ComputeHash(Encoding.UTF8.GetBytes(HexDigest(md5.ComputeHash(Encoding.UTF8.GetBytes(_regionConfig.ApplicationCode + AppPackageId))).ToUpper() +  SignatureMd5))).ToLower();
             }
 
-            return GetPayloadSign(strTimestampExtended, val2.Substring(20, 12) + val2.Substring(0, 10) + val2.Substring(4, 2));
+            return GetPayloadSign(strTimestampExtended, val2.Substring(20, 12) + val2[..10] + val2.Substring(4, 2));
         }
 
         private string DecryptPayloadUsingAppCode(string payload)
@@ -219,67 +216,59 @@ namespace WingandPrayer.MazdaApi
         {
             if (!string.IsNullOrWhiteSpace(_encKey))
             {
-                using (Aes aes = Aes.Create())
-                {
-                    aes.BlockSize = 128;
-                    aes.Padding = PaddingMode.PKCS7;
-                    aes.Key = Encoding.UTF8.GetBytes(_encKey);
-                    aes.IV = Encoding.UTF8.GetBytes(Iv);
+                using Aes aes = Aes.Create();
+                aes.BlockSize = 128;
+                aes.Padding = PaddingMode.PKCS7;
+                aes.Key = Encoding.UTF8.GetBytes(_encKey);
+                aes.IV = Encoding.UTF8.GetBytes(Iv);
 
-                    // Create an decryptor to perform the stream transform.
-                    ICryptoTransform decryptor = aes.CreateDecryptor(aes.Key, aes.IV);
+                // Create an decryptor to perform the stream transform.
+                ICryptoTransform decryptor = aes.CreateDecryptor(aes.Key, aes.IV);
 
-                    aes.Mode = CipherMode.CBC;
+                aes.Mode = CipherMode.CBC;
 
-                    // Create the streams used for encryption.
-                    using MemoryStream msDecrypt = new(Convert.FromBase64String(payload));
-                    using CryptoStream csDecrypt = new(msDecrypt, decryptor, CryptoStreamMode.Read);
-                    using (StreamReader sRDecrypt = new(csDecrypt))
-                    {
-
-                        return sRDecrypt.ReadToEnd();
-                    }
-                }
+                // Create the streams used for encryption.
+                using MemoryStream msDecrypt = new(Convert.FromBase64String(payload));
+                using CryptoStream csDecrypt = new(msDecrypt, decryptor, CryptoStreamMode.Read);
+                using StreamReader sRDecrypt = new(csDecrypt);
+                return sRDecrypt.ReadToEnd();
             }
-            else
-            {
-                throw new MazdaApiException("Missing encryption key");
-            }
+
+            throw new MazdaApiException("Missing encryption key");
         }
 
         private string EncryptPayloadUsingKey(string payload)
         {
-            string retval = String.Empty;
+            string retval = string.Empty;
 
             if (!string.IsNullOrWhiteSpace(payload))
             {
-
-                using (AesManaged aes = new AesManaged())
+                using AesManaged aes = new()
                 {
-                    aes.Mode = CipherMode.CBC;
-                    aes.Padding = PaddingMode.PKCS7;
-                    aes.BlockSize = 128;
-                    aes.Key = Encoding.ASCII.GetBytes(_encKey);
-                    aes.IV = Encoding.ASCII.GetBytes(Iv);
+                    Mode = CipherMode.CBC,
+                    Padding = PaddingMode.PKCS7,
+                    BlockSize = 128,
+                    Key = Encoding.ASCII.GetBytes(_encKey),
+                    IV = Encoding.ASCII.GetBytes(Iv)
+                };
 
-                    // Create an encryptor to perform the stream transform.
-                    ICryptoTransform encryptor = aes.CreateEncryptor(aes.Key, aes.IV);
+                // Create an encryptor to perform the stream transform.
+                ICryptoTransform encryptor = aes.CreateEncryptor(aes.Key, aes.IV);
 
-                    // Create the streams used for encryption.
-                    using MemoryStream msEncrypt = new();
-                    using CryptoStream csEncrypt = new(msEncrypt, encryptor, CryptoStreamMode.Write);
+                // Create the streams used for encryption.
+                using MemoryStream msEncrypt = new();
+                using CryptoStream csEncrypt = new(msEncrypt, encryptor, CryptoStreamMode.Write);
 
-                    byte[] plainText = Encoding.UTF8.GetBytes(payload);
+                byte[] plainText = Encoding.UTF8.GetBytes(payload);
 
-                    byte[] buffer = encryptor.TransformFinalBlock(plainText, 0, plainText.Length);
+                byte[] buffer = encryptor.TransformFinalBlock(plainText, 0, plainText.Length);
 
-                    // csEncrypt.Write(plainText, 0, plainText.Length);
-                    // csEncrypt.FlushFinalBlock();
+                // csEncrypt.Write(plainText, 0, plainText.Length);
+                // csEncrypt.FlushFinalBlock();
 
-                    //return Convert.ToBase64String(msEncrypt.ToArray());
+                //return Convert.ToBase64String(msEncrypt.ToArray());
 
-                    return Convert.ToBase64String(buffer);
-                }
+                return Convert.ToBase64String(buffer);
             }
 
             return retval;
@@ -291,12 +280,10 @@ namespace WingandPrayer.MazdaApi
 
             if (!string.IsNullOrWhiteSpace(payload))
             {
-                return GetPayloadSign(EncryptPayloadUsingKey(payload) + strTimestamp + strTimestamp.Substring(6) + strTimestamp.Substring(3), _signKey);
+                return GetPayloadSign(EncryptPayloadUsingKey(payload) + strTimestamp + strTimestamp[6..] + strTimestamp[3..], _signKey);
             }
-            else
-            {
-                throw new MazdaApiException("Missing sign key");
-            }
+
+            throw new MazdaApiException("Missing sign key");
         }
 
         public async ValueTask<string> ApiRequest(HttpMethod method, string uri, IDictionary<string, string> body = null, bool needsKeys = true, bool needsAuth = false)
@@ -336,7 +323,7 @@ namespace WingandPrayer.MazdaApi
 
                 try
                 {
-                    return await SendRawApiRequest(method, uri, body, needsKeys, needsAuth);
+                    return await SendRawApiRequest(method, uri, body, needsAuth);
                 }
                 catch (Exception e)
                 {
@@ -344,15 +331,14 @@ namespace WingandPrayer.MazdaApi
                     throw;
                 }
             }
-            else
-            {
-                throw new MazdaApiException("Request exceeded max number of retries");
-            }
+
+            throw new MazdaApiException("Request exceeded max number of retries");
         }
 
-        private async ValueTask<string> SendRawApiRequest(HttpMethod method, string uri, string body, bool needsKeys, bool needsAuth)
+        private async ValueTask<string> SendRawApiRequest(HttpMethod method, string uri, string body, bool needsAuth)
         {
             long timestamp = new DateTimeOffset(DateTime.UtcNow).ToUnixTimeMilliseconds();
+            ApiResponse apiResponse;
             string encryptedBody = string.Empty;
 
             if (!string.IsNullOrWhiteSpace(body))
@@ -362,10 +348,10 @@ namespace WingandPrayer.MazdaApi
 
             using HttpClient httpClient = new();
 
-            string sd = @"1,a,S+QO80vxjJRmup348tC6XSu/0QuUCnKtsktmGK/3YsA2nILk0l4QZuPZiJHsnOwByUWTJEFnX4eBfAac6A2F4l3RQs09EjRwmtEb4p5FDOMkTAZOaiYCV1EjQRZNWvw1goyNXVKSlzJxuWXIzNIYeTwSxUxz2T4j6HxssNymGrk=,GACMSZLFbkBnLFtDOsZuU0bKZPFoyZV2lYjAtgALrosukxm4xkzIkJWC7wzsv6V5G05y9qVOVO2Lgz3G487zNzpgPNVP2DY009MdkiTgAhjU2vjRFXrhU0N8Kb/Jrr/sPcUcueVr77Voss/0w8oiTIqMlKsyEYT2/pSyRleW+Fs=$xiXRXVQ28327/FnBTowLYQA6eIVIdImdP6Dvtqy4da7KSbnfE2iQPFLHBvanYlBuswYiPkwSkPqpNDQxCdx+vjyWlm7D56wMd+6TKTlcjBSMjCjtb/INOdwc4d72tylGlUtVr33abMlz/s2tgmib6lZLys41IUxX9wYeXqYlnhDf1kNCXhTzPFRWVCVf8SIOXzFuln3se9Lx7vxDxV1mv/MBRraQyKKtvkOUgiSN33YixAoSkXlEWnhSOqV0eikARguTIY6pzf6dsqT58lvMADpdqN6Ll8jdxnc2CThYIrooBpJdJdClRtU+7MfTmroRIqWDXZMliA5Go7bCfPnOgXPG8cQlFRb+8hdCoFNMrvYuvZ3EO7l90K1geBXHH4zKSUAGo45pE5imb8EsKE441L1M5aKjhAjQIZs8C3p3gS1YsDMJ07RSLKN4y4u8IMKmNB2/nCMH/3I1cILeCKAjy7yfGyEV2B2cA33vEF6cO0F+XAx8RBqeNjsV54GyUD0M6f5QSeEhA2ghjzzqy9xGWAMXtFL9wNmwFthnZCruOlf+Cfh241YuVWReC2x3cxVUxdDZdWj62ppFxPeADmTsT7NPSaBhmOsmR5LCzmk6p5pKF/oSi30IirkNIm3A1CtEfmj0HTTorgq9hm24guxRjd/G+CVTdQVCenxW+OEym2YWd861uimv0D9ZLJiiNNKjyrqNqfeYr3qaJyeMcw5IKoBX8+DheqprnOSgNELwHaN9JBs/Vlf1WSQOAIp29nDxsPQys8KFAcX2xjTx+CxoDti7mAAJhgLXO6qw58FxQTQr8uKnl32oXw4fG1IOt0Ix6AFDRKRFq3GdPxhRC29wV7lc96WtyBA63U3B9+OBU9k7pOfWC+bRKXPPGFdX5mRQSyupw/ynb4Dm9wHzOFsM19tAqXXrEC//WnXZIT8lka/5JC9YEqKUATlS9LoRimBcvdzlAyyMEku/v64umOOECTT5VEXMItJUJZP4Hnm4y4uqYMrMaPodqAhyDeZXoHnTwBcAZtdRQrKY7uwYNtOaqGKACffIh1gnFwn3m+Nmm3sYORapobZg1Zrs+YPbQAJlp3KhTcL9hnkpoeP0A3s4BQjQZ7+ufr9Xwe2VBvC+gRzxGmmFrvOftPcNGkL25tF7pOX0i1EMMXkag9PymStVAW1e0HcfaMLTOAWO/RdPrXVIaOLDbYx0dhLjCgtp1N4W3jimsgeZkHXunnsQlTv9buiM7SFJZQiv/p7nVlihFUolDA5XmnIBZUPNv2UHERxz5GZ4qtLhPqFOEMJCN9F8cxcufoRv16iLJx0HsYcJf6hQsl2UMXDuPgzJJwP1H/Yj3tLeel+D1j26h2qSpoW8PhqGTUDrRKWBJc2NQnC/nJapj4sBaJ+LmXkIo42rfhD/AhB+/vUv3dyxp6HmtCVPujguXE4d0InqEX7zQmhF/7tqZazYjojYTCZ6zbL5j9x/$2000,2000,1000";
+            const string sd = @"1,a,S+QO80vxjJRmup348tC6XSu/0QuUCnKtsktmGK/3YsA2nILk0l4QZuPZiJHsnOwByUWTJEFnX4eBfAac6A2F4l3RQs09EjRwmtEb4p5FDOMkTAZOaiYCV1EjQRZNWvw1goyNXVKSlzJxuWXIzNIYeTwSxUxz2T4j6HxssNymGrk=,GACMSZLFbkBnLFtDOsZuU0bKZPFoyZV2lYjAtgALrosukxm4xkzIkJWC7wzsv6V5G05y9qVOVO2Lgz3G487zNzpgPNVP2DY009MdkiTgAhjU2vjRFXrhU0N8Kb/Jrr/sPcUcueVr77Voss/0w8oiTIqMlKsyEYT2/pSyRleW+Fs=$xiXRXVQ28327/FnBTowLYQA6eIVIdImdP6Dvtqy4da7KSbnfE2iQPFLHBvanYlBuswYiPkwSkPqpNDQxCdx+vjyWlm7D56wMd+6TKTlcjBSMjCjtb/INOdwc4d72tylGlUtVr33abMlz/s2tgmib6lZLys41IUxX9wYeXqYlnhDf1kNCXhTzPFRWVCVf8SIOXzFuln3se9Lx7vxDxV1mv/MBRraQyKKtvkOUgiSN33YixAoSkXlEWnhSOqV0eikARguTIY6pzf6dsqT58lvMADpdqN6Ll8jdxnc2CThYIrooBpJdJdClRtU+7MfTmroRIqWDXZMliA5Go7bCfPnOgXPG8cQlFRb+8hdCoFNMrvYuvZ3EO7l90K1geBXHH4zKSUAGo45pE5imb8EsKE441L1M5aKjhAjQIZs8C3p3gS1YsDMJ07RSLKN4y4u8IMKmNB2/nCMH/3I1cILeCKAjy7yfGyEV2B2cA33vEF6cO0F+XAx8RBqeNjsV54GyUD0M6f5QSeEhA2ghjzzqy9xGWAMXtFL9wNmwFthnZCruOlf+Cfh241YuVWReC2x3cxVUxdDZdWj62ppFxPeADmTsT7NPSaBhmOsmR5LCzmk6p5pKF/oSi30IirkNIm3A1CtEfmj0HTTorgq9hm24guxRjd/G+CVTdQVCenxW+OEym2YWd861uimv0D9ZLJiiNNKjyrqNqfeYr3qaJyeMcw5IKoBX8+DheqprnOSgNELwHaN9JBs/Vlf1WSQOAIp29nDxsPQys8KFAcX2xjTx+CxoDti7mAAJhgLXO6qw58FxQTQr8uKnl32oXw4fG1IOt0Ix6AFDRKRFq3GdPxhRC29wV7lc96WtyBA63U3B9+OBU9k7pOfWC+bRKXPPGFdX5mRQSyupw/ynb4Dm9wHzOFsM19tAqXXrEC//WnXZIT8lka/5JC9YEqKUATlS9LoRimBcvdzlAyyMEku/v64umOOECTT5VEXMItJUJZP4Hnm4y4uqYMrMaPodqAhyDeZXoHnTwBcAZtdRQrKY7uwYNtOaqGKACffIh1gnFwn3m+Nmm3sYORapobZg1Zrs+YPbQAJlp3KhTcL9hnkpoeP0A3s4BQjQZ7+ufr9Xwe2VBvC+gRzxGmmFrvOftPcNGkL25tF7pOX0i1EMMXkag9PymStVAW1e0HcfaMLTOAWO/RdPrXVIaOLDbYx0dhLjCgtp1N4W3jimsgeZkHXunnsQlTv9buiM7SFJZQiv/p7nVlihFUolDA5XmnIBZUPNv2UHERxz5GZ4qtLhPqFOEMJCN9F8cxcufoRv16iLJx0HsYcJf6hQsl2UMXDuPgzJJwP1H/Yj3tLeel+D1j26h2qSpoW8PhqGTUDrRKWBJc2NQnC/nJapj4sBaJ+LmXkIo42rfhD/AhB+/vUv3dyxp6HmtCVPujguXE4d0InqEX7zQmhF/7tqZazYjojYTCZ6zbL5j9x/$2000,2000,1000";
 
             httpClient.DefaultRequestHeaders.Clear();
-            using (HttpRequestMessage request = new HttpRequestMessage() { RequestUri = new Uri(_regionConfig.BaseUrl.ToString() + uri), Method = method, Content = new StringContent(encryptedBody)})
+            using (HttpRequestMessage request = new() {RequestUri = new Uri(_regionConfig.BaseUrl + uri), Method = method, Content = new StringContent(encryptedBody)})
             {
                 request.Headers.Add("device-id", _baseApiDeviceId);
                 request.Headers.Add("app-code", _regionConfig.ApplicationCode);
@@ -378,7 +364,7 @@ namespace WingandPrayer.MazdaApi
                 request.Headers.Add("X-acf-sensor-data", sd);
                 request.Headers.Add("req-id", "req_" + timestamp);
                 request.Headers.Add("timestamp", timestamp.ToString());
-                
+
                 if (uri.Contains("checkVersion"))
                 {
                     request.Headers.Add("sign", GetSignFromTimestamp(timestamp));
@@ -394,41 +380,31 @@ namespace WingandPrayer.MazdaApi
 
                 HttpResponseMessage apiResponseMessage = await httpClient.SendAsync(request);
 
-                ApiResponse apiResponse = await apiResponseMessage.Content.ReadFromJsonAsync<ApiResponse>(new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+                apiResponse = await apiResponseMessage.Content.ReadFromJsonAsync<ApiResponse>(new JsonSerializerOptions {PropertyNameCaseInsensitive = true});
+            }
 
-                if (apiResponse?.State == "S")
-                {
-                    if (uri.Contains("checkVersion"))
-                    {
-                        return DecryptPayloadUsingAppCode(apiResponse?.Payload ?? string.Empty);
-                    }
-                    else
-                    {
-                        return DecryptPayloadUsingKey(apiResponse?.Payload ?? string.Empty);
-                    }
-                }
-                else if (apiResponse.ErrorCode == 600001)
-                {
+            if (apiResponse?.State == "S")
+            {
+                return uri.Contains("checkVersion") ? DecryptPayloadUsingAppCode(apiResponse.Payload) : DecryptPayloadUsingKey(apiResponse.Payload);
+            }
+
+            switch (apiResponse?.ErrorCode)
+            {
+                case 600001:
                     throw new MazdaApiEncryptionException("Server rejected encrypted request");
-                }
-                else if (apiResponse.ErrorCode == 600002)
-                {
+                case 600002:
                     throw new MazdaApiTokenExpiredException("Token expired");
-                }
-                else if (apiResponse.ErrorCode == 92000 && apiResponse?.ExtraCode == "400S01")
-                {
+                case 92000 when apiResponse.ExtraCode == "400S01":
                     throw new MazdaApiRequestInProgressException("Request already in progress, please wait and try again");
-                }
-                else if (apiResponse.ErrorCode == 92000 && apiResponse?.ExtraCode == "400S11")
-                {
+                case 92000 when apiResponse.ExtraCode == "400S11":
                     throw new MazdaApiException("The engine can only be remotely started 2 consecutive times. Please drive the vehicle to reset the counter.");
-                }
-                else if (!string.IsNullOrWhiteSpace(apiResponse?.Error))
+                default:
                 {
-                    throw new MazdaApiException($"Request failed: {apiResponse?.Error}");
-                }
-                else
-                {
+                    if (!string.IsNullOrWhiteSpace(apiResponse?.Error))
+                    {
+                        throw new MazdaApiException($"Request failed: {apiResponse.Error}");
+                    }
+
                     throw new MazdaApiException("Request failed for an unknown reason");
                 }
             }
@@ -440,7 +416,7 @@ namespace WingandPrayer.MazdaApi
             {
                 using HttpClient httpClient = new();
                 httpClient.DefaultRequestHeaders.Add("User-Agent", UserAgentUsherApi);
-                UriBuilder builder = new UriBuilder(_regionConfig.UsherUrl);
+                UriBuilder builder = new(_regionConfig.UsherUrl);
                 builder.Path += @"/system/encryptionKey";
                 NameValueCollection query = HttpUtility.ParseQueryString(builder.Query);
                 query["appId"] = "MazdaApp";
@@ -486,7 +462,7 @@ namespace WingandPrayer.MazdaApi
                         throw new MazdaApiAccountLockedException("Login failed to account being locked");
 
                     default:
-                        throw new MazdaApiLoginFailedException($"Login failed");
+                        throw new MazdaApiLoginFailedException("Login failed");
                 }
             }
             catch (Exception ex)

@@ -17,27 +17,20 @@
 // // If not, see http://www.gnu.org/licenses/.
 // //
 
-using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.ComponentModel.Design;
-using System.Linq;
+using System.Diagnostics.CodeAnalysis;
 using System.Net.Http;
-using System.Runtime.CompilerServices;
-using System.Runtime.InteropServices;
-using System.Text;
-using System.Text.Json;
 using System.Threading.Tasks;
-using System.Xml;
+
 using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 
 using WingandPrayer.MazdaApi.Exceptions;
 
 namespace WingandPrayer.MazdaApi
 {
-    internal partial class MazdaApiController
+    internal class MazdaApiController
     {
+        [SuppressMessage("ReSharper", "UnusedAutoPropertyAccessor.Local")]
         private class ApiResult
         {
             public string ResultCode { get; set; }
@@ -46,14 +39,14 @@ namespace WingandPrayer.MazdaApi
 
         private readonly MazdaApiConnection _connection;
 
-        private bool CheckResult(string json)
+        private static bool CheckResult(string json)
         {
             ApiResult result = JsonConvert.DeserializeObject<ApiResult>(json);
 
             return (result?.ResultCode ?? string.Empty) == "200S00";
         }
 
-        public async ValueTask<string>GetVehicleBaseInformation() => await _connection.ApiRequest(HttpMethod.Post, "/remoteServices/getVecBaseInfos/v4", new Dictionary<string, string>() { { "internaluserid", "__INTERNAL_ID__" } }, true, true);
+        public async ValueTask<string>GetVehicleBaseInformation() => await _connection.ApiRequest(HttpMethod.Post, "/remoteServices/getVecBaseInfos/v4", new Dictionary<string, string> { { "internaluserid", "__INTERNAL_ID__" } }, true, true);
 
         public async ValueTask<string> GetVehicleStatus(string internalVin)
         {
@@ -63,10 +56,8 @@ namespace WingandPrayer.MazdaApi
             {
                 return json;
             }
-            else
-            {
-                throw new MazdaApiException("Failed to get vehicle status");
-            }
+
+            throw new MazdaApiException("Failed to get vehicle status");
         }
 
         public async ValueTask<string> GetNickname(string vin)
@@ -79,15 +70,11 @@ namespace WingandPrayer.MazdaApi
                 {
                     return result?.CarlineDesc;
                 }
-                else
-                {
-                    throw new MazdaApiException("Failed to get vehicle nickname");
-                }
+
+                throw new MazdaApiException("Failed to get vehicle nickname");
             }
-            else
-            {
-                throw new MazdaApiException("Invalid VIN");
-            }
+
+            throw new MazdaApiException("Invalid VIN");
         }
 
         public MazdaApiController(string emailAddress, string password, string region)

@@ -25,9 +25,9 @@ namespace WingandPrayer.MazdaApi.SensorData
 {
     internal class KeyEvent
     {
-        public long EventTime { get; private set; }
-        public int CharCodeSum { get; private set; }
-        public bool LongerThenBefore { get; private set; }
+        public long EventTime { get; }
+        public int CharCodeSum { get; }
+        public bool LongerThenBefore { get; }
 
         public KeyEvent(long eventTime, int charCodeSum, bool longerThenBefore)
         {

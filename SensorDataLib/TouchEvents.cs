@@ -19,17 +19,16 @@
 
 using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
 using System.Linq;
 
 namespace WingandPrayer.MazdaApi.SensorData
 {
     internal class TouchEvent
     {
-        public int EventType { get; private set; }
-        public long EventTime { get; private set; }
-        public int PointerCount { get; private set; }
-        public int ToolType { get; private set; }
+        public int EventType { get; }
+        public long EventTime { get; }
+        public int PointerCount { get; }
+        public int ToolType { get; }
 
         public TouchEvent(int eventType, long eventTime, int pointerCount, int toolType)
         {
@@ -61,45 +60,30 @@ namespace WingandPrayer.MazdaApi.SensorData
 
             long msSinceSensorCollectionStarted = (long)(DateTime.UtcNow - sensorCollectionStartTimestamp).TotalMilliseconds;
 
-            if (msSinceSensorCollectionStarted >= 3000 && msSinceSensorCollectionStarted < 5000)
+            switch (msSinceSensorCollectionStarted)
             {
-                // down event
-                _touchEvents.Add(new TouchEvent(2, msSinceSensorCollectionStarted - rnd.Next(1000, 2000), 1, 1));
-
-                // move events
-                for (int i = 0; i < rnd.Next(2, 9); i++)
-                {
-                    _touchEvents.Add(new TouchEvent(1, rnd.Next(3, 50), 1, 1));
-                }
-
-                // up event
-                _touchEvents.Add(new TouchEvent(3, rnd.Next(3, 100), 1, 1));
-            }
-            else if (msSinceSensorCollectionStarted >= 5000 && msSinceSensorCollectionStarted < 10000)
-            {
-                for (int i = 0; i < 2; i++)
+                case >= 3000 and < 5000:
                 {
                     // down event
-                    _touchEvents.Add(new TouchEvent(2, rnd.Next(100, 1000) + (i == 0 ? 0 : 5000), 1, 1));
-                }
+                    _touchEvents.Add(new TouchEvent(2, msSinceSensorCollectionStarted - rnd.Next(1000, 2000), 1, 1));
 
-                for (int i = 0; i < rnd.Next(2, 9); i++)
-                {
                     // move events
-                    _touchEvents.Add(new TouchEvent(1, rnd.Next(3, 50), 1, 1));
+                    for (int i = 0; i < rnd.Next(2, 9); i++)
+                    {
+                        _touchEvents.Add(new TouchEvent(1, rnd.Next(3, 50), 1, 1));
+                    }
+
+                    // up event
+                    _touchEvents.Add(new TouchEvent(3, rnd.Next(3, 100), 1, 1));
+                    break;
                 }
-
-                // up event
-                _touchEvents.Add(new TouchEvent(3, rnd.Next(3, 100), 1, 1));
-            }
-            else if (msSinceSensorCollectionStarted >= 10000)
-            {
-                for (int j = 0; j < 3; j++)
+                case >= 5000 and < 10000:
                 {
-                    long tso = j == 0 ? msSinceSensorCollectionStarted - 9000 : rnd.Next(2000, 3000);
-
-                    // down event
-                    _touchEvents.Add(new TouchEvent(2, rnd.Next(100, 1000) + tso, 1, 1));
+                    for (int i = 0; i < 2; i++)
+                    {
+                        // down event
+                        _touchEvents.Add(new TouchEvent(2, rnd.Next(100, 1000) + (i == 0 ? 0 : 5000), 1, 1));
+                    }
 
                     for (int i = 0; i < rnd.Next(2, 9); i++)
                     {
@@ -109,8 +93,29 @@ namespace WingandPrayer.MazdaApi.SensorData
 
                     // up event
                     _touchEvents.Add(new TouchEvent(3, rnd.Next(3, 100), 1, 1));
+                    break;
                 }
+                case >= 10000:
+                {
+                    for (int j = 0; j < 3; j++)
+                    {
+                        long tso = j == 0 ? msSinceSensorCollectionStarted - 9000 : rnd.Next(2000, 3000);
 
+                        // down event
+                        _touchEvents.Add(new TouchEvent(2, rnd.Next(100, 1000) + tso, 1, 1));
+
+                        for (int i = 0; i < rnd.Next(2, 9); i++)
+                        {
+                            // move events
+                            _touchEvents.Add(new TouchEvent(1, rnd.Next(3, 50), 1, 1));
+                        }
+
+                        // up event
+                        _touchEvents.Add(new TouchEvent(3, rnd.Next(3, 100), 1, 1));
+                    }
+
+                    break;
+                }
             }
         }
         public int Length => _touchEvents.Count; 

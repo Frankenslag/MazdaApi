@@ -17,10 +17,8 @@
 // // If not, see http://www.gnu.org/licenses/.
 // //
 
-using System;
-using System.Collections.Generic;
 using System.Threading.Tasks;
-using Microsoft.VisualBasic;
+
 using WingandPrayer.MazdaApi.Model;
 using WingandPrayer.MazdaApi.RawModel;
 
@@ -39,7 +37,7 @@ namespace WingandPrayer.MazdaApi
             AlertInfo alertInfo = rawStatus.AlertInfos[0];
             RemoteInfo remoteInfo = rawStatus.RemoteInfos[0];
 
-            return new VehicleStatus()
+            return new VehicleStatus
             {
                 LastUpdatedTimestamp = alertInfo.OccurrenceDate,
                 Latitude = remoteInfo.PositionInfo.Latitude * (remoteInfo.PositionInfo.LatitudeFlag == 1 ? -1 : 1),
@@ -48,7 +46,7 @@ namespace WingandPrayer.MazdaApi
                 FuelRemainingPercent = remoteInfo.ResidualFuel.FuelSegementDActl,
                 FuelDistanceRemainingKm = remoteInfo.ResidualFuel.RemDrvDistDActlKm,
                 OdometerKm = remoteInfo.DriveInformation.OdoDispValue, 
-                Doors = new Doors()
+                Doors = new Doors
                 {
                     DriverDoorOpen = alertInfo.Door.DrStatDrv == 1,
                     PassengerDoorOpen = alertInfo.Door.DrStatPsngr == 1,
@@ -58,22 +56,22 @@ namespace WingandPrayer.MazdaApi
                     HoodOpen = alertInfo.Door.DrStatHood == 1,
                     FuelLidOpen = alertInfo.Door.FuelLidOpenStatus == 1
                 },
-                DoorLocks = new DoorLocks()
+                DoorLocks = new DoorLocks
                 {
                     DriverDoorUnlocked = alertInfo.Door.LockLinkSwDrv == 1,
                     PassengerDoorUnlocked = alertInfo.Door.LockLinkSwPsngr == 1,
                     RearLeftDoorUnlocked = alertInfo.Door.LockLinkSwRl == 1,
                     RearRightDoorUnlocked = alertInfo.Door.LockLinkSwRr == 1
                 },
-                Windows = new Windows()
+                Windows = new Windows
                 {
                     DriverWindowOpen = alertInfo.Pw.PwPosDrv == 1,
                     PassengerWindowOpen = alertInfo.Pw.PwPosPsngr == 1,
                     RearLeftWindowOpen = alertInfo.Pw.PwPosRl == 1,
-                    RearRightWindowOpen = alertInfo.Pw.PwPosRr == 1,
+                    RearRightWindowOpen = alertInfo.Pw.PwPosRr == 1
                 },
                 HazardLightsOn = alertInfo.HazardLamp.HazardSw == 1,
-                TirePressure = new TirePressure()
+                TirePressure = new TirePressure
                 {
                     FrontLeftTirePressurePsi = remoteInfo.TpmsInformation.FltPrsDispPsi,
                     FrontRightTirePressurePsi = remoteInfo.TpmsInformation.FrtPrsDispPsi,

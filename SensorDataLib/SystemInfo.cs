@@ -20,17 +20,15 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Security.Cryptography.X509Certificates;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace WingandPrayer.MazdaApi.SensorData
 {
-    class SystemInfo
+    internal class SystemInfo
     {
-        private readonly int[,] _screenSizes = new int[,] {{ 1280, 720 }, { 1920, 1080 }, { 2560, 1440 } };
+        private readonly int[,] _screenSizes = {{ 1280, 720 }, { 1920, 1080 }, { 2560, 1440 } };
 
-        private readonly Dictionary<string, int> _androidToSdkVersion = new Dictionary<string, int>() { { "11", 30 }, { "10", 29 }, { "9", 28 }, { "8.1.0", 27 }, { "8.0.0", 26 }, { "7.1", 25 }, { "7.0", 24 } };
+        private readonly Dictionary<string, int> _androidToSdkVersion = new() { { "11", 30 }, { "10", 29 }, { "9", 28 }, { "8.1.0", 27 }, { "8.0.0", 26 }, { "7.1", 25 }, { "7.0", 24 } };
 
         private string _deviceName;
         private AndroidModel _deviceModel;
@@ -52,7 +50,7 @@ namespace WingandPrayer.MazdaApi.SensorData
         private void Randomize()
         {
             Random rnd = new();
-            _deviceName = AndroidModels.Models.Keys.ToList<string>()[rnd.Next(0, AndroidModels.Models.Count - 1)];
+            _deviceName = AndroidModels.Models.Keys.ToList()[rnd.Next(0, AndroidModels.Models.Count - 1)];
             _deviceModel = AndroidModels.Models[_deviceName];
             _deviceBuild = _deviceModel.Builds[rnd.Next(0, _deviceModel.Builds.Count - 1)];
             _screenSizeIdx = rnd.Next(0,  _screenSizes.GetLength(0) - 1);
@@ -72,7 +70,8 @@ namespace WingandPrayer.MazdaApi.SensorData
 
         public override string ToString()
         {
-            return string.Join(",", new string[]
+            // ReSharper disable once RedundantExplicitParamsArrayCreation
+            return string.Join(",", new[]
             {
                 "-1", "uaend", "-1", _screenSizes[_screenSizeIdx, 0].ToString(), _screenSizes[_screenSizeIdx, 1].ToString(),
                 _batteryCharging ? "1" : "0", _batteryLevel.ToString(), "1", PercentEncode("en"), PercentEncode(_deviceBuild.Version), _rotationLock ? "1" : "0",
@@ -93,7 +92,7 @@ namespace WingandPrayer.MazdaApi.SensorData
 
             foreach (byte b in Encoding.UTF8.GetBytes(str))
             {
-                sb.Append((b >= 33 && b <= 0x7E && b != 34 && b != 37 & b != 39 && b != 44 && b != 92) ? (char)b : $"%{b:X2}");
+                sb.Append(b is >= 33 and <= 0x7E && b != 34 && b != 37 & b != 39 && b != 44 && b != 92 ? (char)b : $"%{b:X2}");
             }
 
             return sb.ToString();

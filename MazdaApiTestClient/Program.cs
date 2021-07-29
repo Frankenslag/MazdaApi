@@ -23,6 +23,9 @@ using Microsoft.Extensions.Configuration;
 using WingandPrayer.MazdaApi;
 using WingandPrayer.MazdaApi.Model;
 
+// ReSharper disable UnusedVariable
+// ReSharper disable UnusedParameter.Local
+
 namespace Wingandprayer.MazdaApi
 {
     internal class Program
@@ -36,12 +39,14 @@ namespace Wingandprayer.MazdaApi
             {
                 MazdaApiClient client = new(email, secret, region);
 
+                // ReSharper disable once ForeachCanBePartlyConvertedToQueryUsingAnotherGetEnumerator
                 foreach (VehicleModel i in client.GetVehicles().Result)
                 {
                     var vs = client.GetVehicleStatus(i.Id).Result;
                 }
             }
 
+            Console.WriteLine("Press any key to finish");
             Console.ReadKey();
         }
     }

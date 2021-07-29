@@ -19,9 +19,11 @@
 
 using System;
 using System.Collections.Generic;
-using System.Text.Json;
+
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
+
+// ReSharper disable UnusedMember.Global
 
 namespace WingandPrayer.MazdaApi.RawModel
 {
@@ -91,7 +93,7 @@ namespace WingandPrayer.MazdaApi.RawModel
     {
         public StampDateTimeConverter()
         {
-            base.DateTimeFormat = "yyyyMMddHHmmss";
+            DateTimeFormat = "yyyyMMddHHmmss";
         }
     }
 

@@ -31,7 +31,7 @@ namespace WingandPrayer.MazdaApi.Crypto
         {
             using SHA256 encoder256 = SHA256.Create();
             string strHash = BitConverter.ToString(encoder256.ComputeHash(Encoding.UTF8.GetBytes(seed))).Replace("-", "").ToUpper();
-            return strHash.Substring(0, 8) + "-" + strHash.Substring(8, 4) + "-" + strHash.Substring(12, 4) + "-" +
+            return strHash[..8] + "-" + strHash.Substring(8, 4) + "-" + strHash.Substring(12, 4) + "-" +
                    strHash.Substring(16, 4) + "-" + strHash.Substring(20, 12);
         }
 
@@ -39,7 +39,7 @@ namespace WingandPrayer.MazdaApi.Crypto
         {
             using SHA256 encoder256 = SHA256.Create();
             string strHash = BitConverter.ToString(encoder256.ComputeHash(Encoding.UTF8.GetBytes(seed))).Replace("-", "").ToUpper();
-            return $"ACCT{int.Parse(strHash.Substring(0, 8), NumberStyles.HexNumber)}";
+            return $"ACCT{int.Parse(strHash[..8], NumberStyles.HexNumber)}";
         }
 
         /// <summary>
@@ -106,7 +106,7 @@ namespace WingandPrayer.MazdaApi.Crypto
             RSAParameters rsaParameters = new()
             {
                 Modulus = ReadNormalizedInteger(publicKeyReader),
-                Exponent = ReadNormalizedInteger(publicKeyReader),
+                Exponent = ReadNormalizedInteger(publicKeyReader)
             };
 
             publicKeyReader.ThrowIfNotEmpty();

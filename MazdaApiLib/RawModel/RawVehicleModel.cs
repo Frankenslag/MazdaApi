@@ -22,6 +22,8 @@ using System.Collections.Generic;
 
 using Newtonsoft.Json;
 
+// ReSharper disable UnusedMember.Global
+
 namespace WingandPrayer.MazdaApi.RawModel
 {
     public class MazdaApiVehicleCvServiceInformation
@@ -86,7 +88,7 @@ namespace WingandPrayer.MazdaApi.RawModel
 
         public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
         {
-            return JsonConvert.DeserializeObject<MazdaApiVehicleInformation>((string)(reader.Value) ?? string.Empty);
+            return JsonConvert.DeserializeObject<MazdaApiVehicleInformation>((string)reader.Value ?? string.Empty);
         }
 
         public override bool CanConvert(Type objectType)
@@ -107,7 +109,7 @@ namespace WingandPrayer.MazdaApi.RawModel
         public string RsaPhoneNumberDomestic { get; set; }
         public string RsaStatus { get; set; }
         public string CountryCode { get; set; }
-        [Newtonsoft.Json.JsonConverter(typeof(VehicleInfoConverter))]
+        [JsonConverter(typeof(VehicleInfoConverter))]
         public MazdaApiVehicleInformation VehicleInformation { get; set; }
         public MazdaApiVehicleCvInformation CvInformation { get; set; }
     }

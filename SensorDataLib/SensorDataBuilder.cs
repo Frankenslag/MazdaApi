@@ -20,7 +20,6 @@
 using System;
 using System.Globalization;
 using System.Linq;
-using System.Runtime.InteropServices;
 using System.Text;
 
 
@@ -30,14 +29,14 @@ namespace WingandPrayer.MazdaApi.SensorData
     {
         private const string SdkVersion = "2.2.3";
 
-        private int _deviceInfoTime;
-        private DateTime _sensorCollectionStartTimestamp;
-        private SystemInfo _systemInfo;
-        private TouchEvents _touchEvents;
-        private KeyEvents _keyEvents;
-        private BackgroundEvents _backgroundEvents;
-        private PerformanceTestResults _performanceTestResults;
-        private SensorDataEncryptor _sensorDataEncryptor;
+        private readonly int _deviceInfoTime;
+        private readonly DateTime _sensorCollectionStartTimestamp;
+        private readonly SystemInfo _systemInfo;
+        private readonly TouchEvents _touchEvents;
+        private readonly KeyEvents _keyEvents;
+        private readonly BackgroundEvents _backgroundEvents;
+        private readonly PerformanceTestResults _performanceTestResults;
+        private readonly SensorDataEncryptor _sensorDataEncryptor;
 
         public SensorDataBuilder()
         {
@@ -66,7 +65,7 @@ namespace WingandPrayer.MazdaApi.SensorData
 
             sensorData.Append(SdkVersion);
             sensorData.Append("-1,2,-94,-100,");
-            sensorData.Append(_systemInfo.ToString());
+            sensorData.Append(_systemInfo);
             sensorData.Append(",");
             sensorData.Append(_systemInfo.GetSum().ToString(CultureInfo.InvariantCulture));
             sensorData.Append(",");
@@ -82,9 +81,9 @@ namespace WingandPrayer.MazdaApi.SensorData
             sensorData.Append("-1,2,-94,-102,");
             sensorData.Append(GenerateEditedText());
             sensorData.Append("-1,2,-94,-108,");
-            sensorData.Append(_keyEvents.ToString());
+            sensorData.Append(_keyEvents);
             sensorData.Append("-1,2,-94,-117,");
-            sensorData.Append(_touchEvents.ToString());
+            sensorData.Append(_touchEvents);
             sensorData.Append("-1,2,-94,-111,");
             sensorData.Append(orientationEvent);
             sensorData.Append("-1,2,-94,-109,");
@@ -106,18 +105,18 @@ namespace WingandPrayer.MazdaApi.SensorData
             sensorData.Append("-1,2,-94,-120,");
             sensorData.Append(GenerateStoredStackTraces());
             sensorData.Append("-1,2,-94,-112,");
-            sensorData.Append(_performanceTestResults.ToString());
+            sensorData.Append(_performanceTestResults);
             sensorData.Append("-1,2,-94,-103,");
-            sensorData.Append(_backgroundEvents.ToString());
+            sensorData.Append(_backgroundEvents);
 
             return _sensorDataEncryptor.EncryptSensorData(sensorData.ToString());
         }
 
         private static long FeistelCipher(uint upper32, uint lower32, long key)
         {
-            int iterate(int arg1, int arg2, int arg3)
+            static int Iterate(int arg1, int arg2, int arg3)
             {
-                return arg1 ^ (arg2 >> (32 - arg3) | (int)(arg2 << arg3));
+                return arg1 ^ (arg2 >> (32 - arg3) | (arg2 << arg3));
             }
 
             int lower = (int)lower32;
@@ -130,7 +129,7 @@ namespace WingandPrayer.MazdaApi.SensorData
 
             for (int i = 0; i < 16; i++)
             {
-                int v21 = upper2 ^ iterate(lower2, (int)key, i);
+                int v21 = upper2 ^ Iterate(lower2, (int)key, i);
                 int v8 = lower2;
                 lower2 = v21;
                 upper2 = v8;
@@ -143,12 +142,13 @@ namespace WingandPrayer.MazdaApi.SensorData
         {
             long sumTextEventValues = _keyEvents.GetSum();
             long sumTouchEventTimestampsAndTypes = _touchEvents.GetSum();
-            int orientationDataB = 0;
-            int motionDataB = 0;
+            const int orientationDataB = 0;
+            const int motionDataB = 0;
             long overallSum = sumTextEventValues + sumTouchEventTimestampsAndTypes + orientationDataB + motionDataB;
             long startTime = new DateTimeOffset(_sensorCollectionStartTimestamp).ToUnixTimeMilliseconds();
 
-            return string.Join(",", new string[]
+            // ReSharper disable once RedundantExplicitParamsArrayCreation
+            return string.Join(",", new[]
             {
                 sumTextEventValues.ToString(CultureInfo.InvariantCulture),
                 sumTouchEventTimestampsAndTypes.ToString(CultureInfo.InvariantCulture),
@@ -169,16 +169,16 @@ namespace WingandPrayer.MazdaApi.SensorData
             });
         }
 
-        private string GenerateEditedText() => string.Empty;
-        private string GenerateOrientationDataAa() => string.Empty;
-        private string GenerateOrientationDataAb() => string.Empty;
-        private string GenerateOrientationDataAc() => string.Empty;
-        private string GenerateMotionDataAa() => string.Empty;
-        private string GenerateMotionDataAc() => string.Empty;
-        private string GenerateMotionEvent() => string.Empty;
-        private string GenerateStoredValuesF() => "-1";
-        private string GenerateStoredValuesG() => "0";
-        private string GenerateStoredStackTraces() => string.Empty;
+        private static string GenerateEditedText() => string.Empty;
+        private static string GenerateOrientationDataAa() => string.Empty;
+        private static string GenerateOrientationDataAb() => string.Empty;
+        private static string GenerateOrientationDataAc() => string.Empty;
+        private static string GenerateMotionDataAa() => string.Empty;
+        private static string GenerateMotionDataAc() => string.Empty;
+        private static string GenerateMotionEvent() => string.Empty;
+        private static string GenerateStoredValuesF() => "-1";
+        private static string GenerateStoredValuesG() => "0";
+        private static string GenerateStoredStackTraces() => string.Empty;
     }
 }
 

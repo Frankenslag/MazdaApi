@@ -25,8 +25,8 @@ namespace WingandPrayer.MazdaApi.SensorData
 {
     internal class BackgroundEvent
     {
-        public int EventType { get; private set; }
-        public long EventTime { get; private set; }
+        public int EventType { get; }
+        public long EventTime { get; }
 
         public BackgroundEvent(int eventType, long eventTime)
         {

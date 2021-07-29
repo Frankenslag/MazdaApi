@@ -49,7 +49,7 @@ namespace WingandPrayer.MazdaApi
             {
                 MazdaApiVehicleOtherInformation otherInformation = baseInfo.Vehicle.VehicleInformation.OtherInformation;
 
-                retval.Add(new VehicleModel()
+                retval.Add(new VehicleModel
                 {
                     Vin = baseInfo.Vin,
                     Id = baseInfo.Vehicle.CvInformation.InternalVin,
