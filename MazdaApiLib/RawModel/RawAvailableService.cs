@@ -1,5 +1,5 @@
 ﻿// 
-// MazdaApiEncryptionException.cs
+// RawAvailableService.cs
 // 
 // Copyright 2021 Wingandprayer Software
 // 
@@ -16,13 +16,11 @@
 // You should have received a copy of the GNU General Public License along with MazdaApiLib.
 // If not, see http://www.gnu.org/licenses/.
 
-namespace WingandPrayer.MazdaApi.Exceptions
+namespace WingandPrayer.MazdaApi.RawModel
 {
-    /// <summary>
-    /// Raised when server reports that the request is not encrypted properly
-    /// </summary>
-    public class MazdaApiEncryptionException : MazdaApiException
+    internal class RawAvailableService
     {
-        public MazdaApiEncryptionException(string strStatus) : base(strStatus) { }
+        public string ResultCode { get; set; }
+        public string AvailableService { get; set; }
     }
 }

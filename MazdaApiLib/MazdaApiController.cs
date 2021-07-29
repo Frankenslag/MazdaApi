@@ -1,29 +1,31 @@
-﻿// //
-// // MazdaApiController.cs
-// //
-// // Copyright 2021 Wingandprayer Software
-// //
-// // This file is part of MazdaApiLib.
-// //
-// // MazdaApiLib is free software: you can redistribute it and/or modify it under the terms of the
-// // GNU General Public License as published by the Free Software Foundation, either version 2
-// // of the License, or (at your option) any later version.
-// //
-// // CDRipper is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
-// // without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
-// // PURPOSE. See the GNU General Public License for more details.
-// //
-// // You should have received a copy of the GNU General Public License along with MazdaApiLib.
-// // If not, see http://www.gnu.org/licenses/.
-// //
+﻿// 
+// MazdaApiController.cs
+// 
+// Copyright 2021 Wingandprayer Software
+// 
+// This file is part of MazdaApiLib.
+// 
+// MazdaApiLib is free software: you can redistribute it and/or modify it under the terms of the
+// GNU General Public License as published by the Free Software Foundation, either version 2
+// of the License, or (at your option) any later version.
+// 
+// CDRipper is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+// without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+// PURPOSE. See the GNU General Public License for more details.
+// 
+// You should have received a copy of the GNU General Public License along with MazdaApiLib.
+// If not, see http://www.gnu.org/licenses/.
 
+using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Net.Http;
+using System.Text;
 using System.Threading.Tasks;
 
 using Newtonsoft.Json;
 
+using WingandPrayer.MazdaApi.RawModel;
 using WingandPrayer.MazdaApi.Exceptions;
 
 namespace WingandPrayer.MazdaApi
@@ -58,6 +60,28 @@ namespace WingandPrayer.MazdaApi
             }
 
             throw new MazdaApiException("Failed to get vehicle status");
+        }
+
+        public async Task<string> GetAvailableServiceAsync(string internalVin)
+        {
+            RawAvailableService result = JsonConvert.DeserializeObject<RawAvailableService>(await _connection.ApiRequestAsync(HttpMethod.Post, "/remoteServices/getAvailableService/v4", $"{{\"internaluserid\": \"__INTERNAL_ID__\", \"internaluseridget\": \"__INTERNAL_ID__\", \"internalvin\": {internalVin}}}", true, true));
+
+            if ((result?.ResultCode ?? string.Empty) == "200S00")
+            {
+                return Encoding.UTF8.GetString(Convert.FromBase64String(result?.AvailableService ?? string.Empty));
+            }
+
+            throw new MazdaApiException("Failed to get available service");
+        }
+
+        public async Task SetHazzardLightAsync(string internalVin, bool blnLightOn)
+        {
+            ApiResult result = JsonConvert.DeserializeObject<ApiResult>(await _connection.ApiRequestAsync(HttpMethod.Post, $"/remoteServices/{(blnLightOn ? "lightOn" : "lightOff")}/v4", $"{{\"internaluserid\": \"__INTERNAL_ID__\", \"vin\": {internalVin}}}", true, true));
+
+            if ((result?.ResultCode ?? string.Empty) != "200S00")
+            {
+                throw new MazdaApiException($"Failed to turn light {(blnLightOn ? "on" : "off")}");
+            }
         }
 
         public async Task<string> GetNicknameAsync(string vin)
