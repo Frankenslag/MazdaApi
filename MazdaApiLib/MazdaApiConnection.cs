@@ -137,7 +137,7 @@ namespace WingandPrayer.MazdaApi
         private DateTime _accessTokenExpirationTs;
         private string _encKey;
         private string _signKey;
-        private SensorDataBuilder _sensorDataBuilder;
+        private readonly SensorDataBuilder _sensorDataBuilder;
 
         public MazdaApiConnection(string emailAddress, string password, string region)
         {
@@ -348,8 +348,6 @@ namespace WingandPrayer.MazdaApi
 
             using HttpClient httpClient = new();
 
-            const string sd = @"1,a,S+QO80vxjJRmup348tC6XSu/0QuUCnKtsktmGK/3YsA2nILk0l4QZuPZiJHsnOwByUWTJEFnX4eBfAac6A2F4l3RQs09EjRwmtEb4p5FDOMkTAZOaiYCV1EjQRZNWvw1goyNXVKSlzJxuWXIzNIYeTwSxUxz2T4j6HxssNymGrk=,GACMSZLFbkBnLFtDOsZuU0bKZPFoyZV2lYjAtgALrosukxm4xkzIkJWC7wzsv6V5G05y9qVOVO2Lgz3G487zNzpgPNVP2DY009MdkiTgAhjU2vjRFXrhU0N8Kb/Jrr/sPcUcueVr77Voss/0w8oiTIqMlKsyEYT2/pSyRleW+Fs=$xiXRXVQ28327/FnBTowLYQA6eIVIdImdP6Dvtqy4da7KSbnfE2iQPFLHBvanYlBuswYiPkwSkPqpNDQxCdx+vjyWlm7D56wMd+6TKTlcjBSMjCjtb/INOdwc4d72tylGlUtVr33abMlz/s2tgmib6lZLys41IUxX9wYeXqYlnhDf1kNCXhTzPFRWVCVf8SIOXzFuln3se9Lx7vxDxV1mv/MBRraQyKKtvkOUgiSN33YixAoSkXlEWnhSOqV0eikARguTIY6pzf6dsqT58lvMADpdqN6Ll8jdxnc2CThYIrooBpJdJdClRtU+7MfTmroRIqWDXZMliA5Go7bCfPnOgXPG8cQlFRb+8hdCoFNMrvYuvZ3EO7l90K1geBXHH4zKSUAGo45pE5imb8EsKE441L1M5aKjhAjQIZs8C3p3gS1YsDMJ07RSLKN4y4u8IMKmNB2/nCMH/3I1cILeCKAjy7yfGyEV2B2cA33vEF6cO0F+XAx8RBqeNjsV54GyUD0M6f5QSeEhA2ghjzzqy9xGWAMXtFL9wNmwFthnZCruOlf+Cfh241YuVWReC2x3cxVUxdDZdWj62ppFxPeADmTsT7NPSaBhmOsmR5LCzmk6p5pKF/oSi30IirkNIm3A1CtEfmj0HTTorgq9hm24guxRjd/G+CVTdQVCenxW+OEym2YWd861uimv0D9ZLJiiNNKjyrqNqfeYr3qaJyeMcw5IKoBX8+DheqprnOSgNELwHaN9JBs/Vlf1WSQOAIp29nDxsPQys8KFAcX2xjTx+CxoDti7mAAJhgLXO6qw58FxQTQr8uKnl32oXw4fG1IOt0Ix6AFDRKRFq3GdPxhRC29wV7lc96WtyBA63U3B9+OBU9k7pOfWC+bRKXPPGFdX5mRQSyupw/ynb4Dm9wHzOFsM19tAqXXrEC//WnXZIT8lka/5JC9YEqKUATlS9LoRimBcvdzlAyyMEku/v64umOOECTT5VEXMItJUJZP4Hnm4y4uqYMrMaPodqAhyDeZXoHnTwBcAZtdRQrKY7uwYNtOaqGKACffIh1gnFwn3m+Nmm3sYORapobZg1Zrs+YPbQAJlp3KhTcL9hnkpoeP0A3s4BQjQZ7+ufr9Xwe2VBvC+gRzxGmmFrvOftPcNGkL25tF7pOX0i1EMMXkag9PymStVAW1e0HcfaMLTOAWO/RdPrXVIaOLDbYx0dhLjCgtp1N4W3jimsgeZkHXunnsQlTv9buiM7SFJZQiv/p7nVlihFUolDA5XmnIBZUPNv2UHERxz5GZ4qtLhPqFOEMJCN9F8cxcufoRv16iLJx0HsYcJf6hQsl2UMXDuPgzJJwP1H/Yj3tLeel+D1j26h2qSpoW8PhqGTUDrRKWBJc2NQnC/nJapj4sBaJ+LmXkIo42rfhD/AhB+/vUv3dyxp6HmtCVPujguXE4d0InqEX7zQmhF/7tqZazYjojYTCZ6zbL5j9x/$2000,2000,1000";
-
             httpClient.DefaultRequestHeaders.Clear();
             using (HttpRequestMessage request = new() {RequestUri = new Uri(_regionConfig.BaseUrl + uri), Method = method, Content = new StringContent(encryptedBody)})
             {
@@ -360,8 +358,7 @@ namespace WingandPrayer.MazdaApi
                 request.Headers.Add("app-version", AppVersion);
                 request.Headers.Add("app-unique-id", AppPackageId);
                 request.Headers.Add("access-token", needsAuth ? _accessToken : string.Empty);
-                //request.Headers.Add("X-acf-sensor-data", _sensorDataBuilder.GenerateSensorData());
-                request.Headers.Add("X-acf-sensor-data", sd);
+                request.Headers.Add("X-acf-sensor-data", _sensorDataBuilder.GenerateSensorData());
                 request.Headers.Add("req-id", "req_" + timestamp);
                 request.Headers.Add("timestamp", timestamp.ToString());
 

@@ -25,6 +25,8 @@ using WingandPrayer.MazdaApi.RawModel;
 
 using Newtonsoft.Json;
 
+// ReSharper disable UnusedMember.Global
+
 namespace WingandPrayer.MazdaApi
 {
     public partial class MazdaApiClient

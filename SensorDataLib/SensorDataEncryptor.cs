@@ -85,7 +85,7 @@ namespace WingandPrayer.MazdaApi.SensorData
                 encrIvAndSensorDataAndHmac = encrIvAndSensorData.Concat(hmac.ComputeHash(encrIvAndSensorData)).ToArray();
             }
 
-            return $"1,a,{Convert.ToBase64String(_encryptedAesKey)},{Convert.ToBase64String(_encryptedHmacSha256Key)}${Convert.ToString(encrIvAndSensorDataAndHmac)}${rnd.Next(0, 3) * 1000},{rnd.Next(0, 3) * 1000},{rnd.Next(0, 3) * 1000}";
+            return $"1,a,{Convert.ToBase64String(_encryptedAesKey)},{Convert.ToBase64String(_encryptedHmacSha256Key)}${Convert.ToBase64String(encrIvAndSensorDataAndHmac)}${rnd.Next(0, 3) * 1000},{rnd.Next(0, 3) * 1000},{rnd.Next(0, 3) * 1000}";
         }
     }
 }
