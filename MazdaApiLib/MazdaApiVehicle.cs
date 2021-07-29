@@ -32,20 +32,25 @@ namespace WingandPrayer.MazdaApi
         private readonly bool _useCachedVehicleList;
         private MazdaApiVehicles _vehicleCache;
 
-        public async ValueTask<MazdaApiVehicles> GetRawVehicles()
+        public MazdaApiVehicles GetRawVehicles() => GetRawVehiclesAsync().GetAwaiter().GetResult();
+
+        public async Task<MazdaApiVehicles> GetRawVehiclesAsync()
         {
             if (_vehicleCache == null || !_useCachedVehicleList)
             {
-                _vehicleCache = JsonConvert.DeserializeObject<MazdaApiVehicles>(await _controller.GetVehicleBaseInformation());
+                _vehicleCache = JsonConvert.DeserializeObject<MazdaApiVehicles>(await _controller.GetVehicleBaseInformationAsync());
             }
 
             return _vehicleCache;
         }
-        public async ValueTask<List<VehicleModel>> GetVehicles()
+
+        public List<VehicleModel> GetVehicles() => GetVehiclesAsync().GetAwaiter().GetResult();
+
+        public async Task<List<VehicleModel>> GetVehiclesAsync()
         {
             List<VehicleModel> retval = new();
 
-            foreach (MazdaApiRawVehicleBaseInfo baseInfo in (await GetRawVehicles()).VecBaseInfos)
+            foreach (MazdaApiRawVehicleBaseInfo baseInfo in (await GetRawVehiclesAsync()).VecBaseInfos)
             {
                 MazdaApiVehicleOtherInformation otherInformation = baseInfo.Vehicle.VehicleInformation.OtherInformation;
 
@@ -53,7 +58,7 @@ namespace WingandPrayer.MazdaApi
                 {
                     Vin = baseInfo.Vin,
                     Id = baseInfo.Vehicle.CvInformation.InternalVin,
-                    Nickname = await _controller.GetNickname(baseInfo.Vin),
+                    Nickname = await _controller.GetNicknameAsync(baseInfo.Vin),
                     CarlineCode = otherInformation.CarlineCode,
                     CarlineName = otherInformation.CarlineName,
                     ModelYear = otherInformation.ModelYear,

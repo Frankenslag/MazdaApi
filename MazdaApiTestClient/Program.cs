@@ -18,8 +18,10 @@
 // //
 
 using System;
+using System.ComponentModel;
 using System.Linq;
 using Microsoft.Extensions.Configuration;
+
 using WingandPrayer.MazdaApi;
 using WingandPrayer.MazdaApi.Model;
 
@@ -30,6 +32,14 @@ namespace Wingandprayer.MazdaApi
 {
     internal class Program
     {
+        private static void DumpObj(object obj)
+        {
+            foreach (PropertyDescriptor descriptor in TypeDescriptor.GetProperties(obj))
+            {
+                Console.WriteLine($"{descriptor.Name} = {descriptor.GetValue(obj)}");
+            }
+        }
+
         private static void Main(string[] args)
         {
             IConfigurationRoot config = new ConfigurationBuilder().AddUserSecrets<Program>().Build();
@@ -40,9 +50,11 @@ namespace Wingandprayer.MazdaApi
                 MazdaApiClient client = new(email, secret, region);
 
                 // ReSharper disable once ForeachCanBePartlyConvertedToQueryUsingAnotherGetEnumerator
-                foreach (VehicleModel i in client.GetVehicles().Result)
+                foreach (VehicleModel i in client.GetVehicles())
                 {
-                    var vs = client.GetVehicleStatus(i.Id).Result;
+                    DumpObj(i);
+                    VehicleStatus vs = client.GetVehicleStatus(i.Id);
+                    DumpObj(vs);
                 }
             }
 

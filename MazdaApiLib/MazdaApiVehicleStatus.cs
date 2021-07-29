@@ -28,11 +28,16 @@ namespace WingandPrayer.MazdaApi
 {
     public partial class MazdaApiClient
     {
-        public async ValueTask<MazdaApiRawVehicleStatus> GetRawVehicleStatus(string internalVin) => JsonConvert.DeserializeObject<MazdaApiRawVehicleStatus>(await _controller.GetVehicleStatus(internalVin));
 
-        public async ValueTask<VehicleStatus> GetVehicleStatus(string internalVin)
+        public MazdaApiRawVehicleStatus GetRawVehicleStatus(string internalVin) => GetRawVehicleStatusAsync(internalVin).GetAwaiter().GetResult();
+
+        public async Task<MazdaApiRawVehicleStatus> GetRawVehicleStatusAsync(string internalVin) => JsonConvert.DeserializeObject<MazdaApiRawVehicleStatus>(await _controller.GetVehicleStatusAsync(internalVin));
+
+        public VehicleStatus GetVehicleStatus(string internalVin) => GetVehicleStatusAsync(internalVin).GetAwaiter().GetResult();
+
+        public async Task<VehicleStatus> GetVehicleStatusAsync(string internalVin)
         {
-            MazdaApiRawVehicleStatus rawStatus = await GetRawVehicleStatus(internalVin);
+            MazdaApiRawVehicleStatus rawStatus = await GetRawVehicleStatusAsync(internalVin);
 
             AlertInfo alertInfo = rawStatus.AlertInfos[0];
             RemoteInfo remoteInfo = rawStatus.RemoteInfos[0];

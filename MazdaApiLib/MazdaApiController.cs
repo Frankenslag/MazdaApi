@@ -46,11 +46,11 @@ namespace WingandPrayer.MazdaApi
             return (result?.ResultCode ?? string.Empty) == "200S00";
         }
 
-        public async ValueTask<string>GetVehicleBaseInformation() => await _connection.ApiRequest(HttpMethod.Post, "/remoteServices/getVecBaseInfos/v4", new Dictionary<string, string> { { "internaluserid", "__INTERNAL_ID__" } }, true, true);
+        public async Task<string>GetVehicleBaseInformationAsync() => await _connection.ApiRequestAsync(HttpMethod.Post, "/remoteServices/getVecBaseInfos/v4", new Dictionary<string, string> { { "internaluserid", "__INTERNAL_ID__" } }, true, true);
 
-        public async ValueTask<string> GetVehicleStatus(string internalVin)
+        public async Task<string> GetVehicleStatusAsync(string internalVin)
         {
-            string json = await _connection.ApiRequest(HttpMethod.Post, "/remoteServices/getVehicleStatus/v4", $"{{\"internaluserid\": \"__INTERNAL_ID__\", \"internalvin\": {internalVin}, \"limit\": 1, \"offset\": 0, \"vecinfotype\": \"0\" }}", true, true);
+            string json = await _connection.ApiRequestAsync(HttpMethod.Post, "/remoteServices/getVehicleStatus/v4", $"{{\"internaluserid\": \"__INTERNAL_ID__\", \"internalvin\": {internalVin}, \"limit\": 1, \"offset\": 0, \"vecinfotype\": \"0\" }}", true, true);
 
             if (CheckResult(json))
             {
@@ -60,11 +60,11 @@ namespace WingandPrayer.MazdaApi
             throw new MazdaApiException("Failed to get vehicle status");
         }
 
-        public async ValueTask<string> GetNickname(string vin)
+        public async Task<string> GetNicknameAsync(string vin)
         {
             if (vin.Length == 17)
             {
-                ApiResult result = JsonConvert.DeserializeObject<ApiResult>(await _connection.ApiRequest(HttpMethod.Post, "/remoteServices/getNickName/v4", $"{{\"internaluserid\": \"__INTERNAL_ID__\", \"vin\": \"{vin}\"}}", true, true));
+                ApiResult result = JsonConvert.DeserializeObject<ApiResult>(await _connection.ApiRequestAsync(HttpMethod.Post, "/remoteServices/getNickName/v4", $"{{\"internaluserid\": \"__INTERNAL_ID__\", \"vin\": \"{vin}\"}}", true, true));
 
                 if ((result?.ResultCode ?? string.Empty) == "200S00")
                 {

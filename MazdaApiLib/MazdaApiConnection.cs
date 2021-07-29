@@ -286,23 +286,23 @@ namespace WingandPrayer.MazdaApi
             throw new MazdaApiException("Missing sign key");
         }
 
-        public async ValueTask<string> ApiRequest(HttpMethod method, string uri, IDictionary<string, string> body = null, bool needsKeys = true, bool needsAuth = false)
+        public async Task<string> ApiRequestAsync(HttpMethod method, string uri, IDictionary<string, string> body = null, bool needsKeys = true, bool needsAuth = false)
         {
-            return await SendApiRequest(method, uri, JsonConvert.SerializeObject(body, Formatting.None), needsKeys, needsAuth);
+            return await SendApiRequestAsync(method, uri, JsonConvert.SerializeObject(body, Formatting.None), needsKeys, needsAuth);
         }
 
-        public async ValueTask<string> ApiRequest(HttpMethod method, string uri, string body = "", bool needsKeys = true, bool needsAuth = false)
+        public async Task<string> ApiRequestAsync(HttpMethod method, string uri, string body = "", bool needsKeys = true, bool needsAuth = false)
         {
-            return await SendApiRequest(method, uri, body, needsKeys, needsAuth);
+            return await SendApiRequestAsync(method, uri, body, needsKeys, needsAuth);
         }
 
-        private async ValueTask<string> SendApiRequest(HttpMethod method, string uri, string body, bool needsKeys, bool needsAuth, int numRetries = 0)
+        private async Task<string> SendApiRequestAsync(HttpMethod method, string uri, string body, bool needsKeys, bool needsAuth, int numRetries = 0)
         {
             if (numRetries <= MaxRetries)
             {
                 if (needsKeys && (string.IsNullOrEmpty(_encKey) || string.IsNullOrEmpty(_signKey)))
                 {
-                    CheckVersionResponse checkVersionResponse = JsonSerializer.Deserialize<CheckVersionResponse>(await SendApiRequest(HttpMethod.Post, "/service/checkVersion", null, false, false), new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+                    CheckVersionResponse checkVersionResponse = JsonSerializer.Deserialize<CheckVersionResponse>(await SendApiRequestAsync(HttpMethod.Post, "/service/checkVersion", null, false, false), new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
                     _encKey = checkVersionResponse?.EncKey;
                     _signKey = checkVersionResponse?.SignKey;
                 }
@@ -317,13 +317,13 @@ namespace WingandPrayer.MazdaApi
 
                     if (string.IsNullOrWhiteSpace(_accessToken))
                     {
-                        await Login();
+                        await LoginAsync();
                     }
                 }
 
                 try
                 {
-                    return await SendRawApiRequest(method, uri, body, needsAuth);
+                    return await SendRawApiRequestAsync(method, uri, body, needsAuth);
                 }
                 catch (Exception e)
                 {
@@ -335,7 +335,7 @@ namespace WingandPrayer.MazdaApi
             throw new MazdaApiException("Request exceeded max number of retries");
         }
 
-        private async ValueTask<string> SendRawApiRequest(HttpMethod method, string uri, string body, bool needsAuth)
+        private async Task<string> SendRawApiRequestAsync(HttpMethod method, string uri, string body, bool needsAuth)
         {
             long timestamp = new DateTimeOffset(DateTime.UtcNow).ToUnixTimeMilliseconds();
             ApiResponse apiResponse;
@@ -410,7 +410,7 @@ namespace WingandPrayer.MazdaApi
             }
         }
 
-        private async Task Login()
+        private async Task LoginAsync()
         {
             try
             {
