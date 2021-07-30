@@ -9,7 +9,12 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MazdaApiLib", "MazdaApiLib\
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SensorDataLib", "SensorDataLib\SensorDataLib.csproj", "{6C7E8B9E-234B-440E-BCD3-26F2EAFA5753}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CryptoLib", "CryptoUtilsLib\CryptoLib.csproj", "{13555B73-AC7F-4B6E-9CBA-E519643E911E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CryptoLib", "CryptoUtilsLib\CryptoLib.csproj", "{13555B73-AC7F-4B6E-9CBA-E519643E911E}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{1ED14DB2-C805-4AA4-B642-5B7795A337E0}"
+	ProjectSection(SolutionItems) = preProject
+		LICENSE = LICENSE
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

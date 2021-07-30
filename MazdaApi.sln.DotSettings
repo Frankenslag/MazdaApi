@@ -1,19 +1,27 @@
 ﻿<wpf:ResourceDictionary xml:space="preserve" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:s="clr-namespace:System;assembly=mscorlib" xmlns:ss="urn:shemas-jetbrains-com:settings-storage-xaml" xmlns:wpf="http://schemas.microsoft.com/winfx/2006/xaml/presentation">
 	<s:String x:Key="/Default/CodeStyle/FileHeader/FileHeaderText/@EntryValue">&#xD;
 $FILENAME$&#xD;
- &#xD;
-Copyright $CURRENT_YEAR$ Wingandprayer Software&#xD;
 &#xD;
-This file is part of MazdaApiLib.&#xD;
+MIT License&#xD;
 &#xD;
-MazdaApiLib is free software: you can redistribute it and/or modify it under the terms of the&#xD;
-GNU General Public License as published by the Free Software Foundation, either version 2&#xD;
-of the License, or (at your option) any later version.&#xD;
+Copyright (c) 2021 Andrew Gould&#xD;
 &#xD;
-CDRipper is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;&#xD;
-without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR&#xD;
-PURPOSE. See the GNU General Public License for more details.&#xD;
+Permission is hereby granted, free of charge, to any person obtaining a copy&#xD;
+of this software and associated documentation files (the "Software"), to deal&#xD;
+in the Software without restriction, including without limitation the rights&#xD;
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell&#xD;
+copies of the Software, and to permit persons to whom the Software is&#xD;
+furnished to do so, subject to the following conditions:&#xD;
 &#xD;
-You should have received a copy of the GNU General Public License along with MazdaApiLib.&#xD;
-If not, see http://www.gnu.org/licenses/.&#xD;
+The above copyright notice and this permission notice shall be included in all&#xD;
+copies or substantial portions of the Software.&#xD;
+&#xD;
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR&#xD;
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,&#xD;
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE&#xD;
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER&#xD;
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,&#xD;
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE&#xD;
+SOFTWARE.&#xD;
+&#xD;
 </s:String></wpf:ResourceDictionary>
