@@ -33,7 +33,6 @@ using System.Threading.Tasks;
 
 using Newtonsoft.Json;
 
-using WingandPrayer.MazdaApi.RawModel;
 using WingandPrayer.MazdaApi.Exceptions;
 
 namespace WingandPrayer.MazdaApi
@@ -44,6 +43,7 @@ namespace WingandPrayer.MazdaApi
         private class ApiResult
         {
             public string ResultCode { get; set; }
+            public string AvailableService { get; set; }
             public string CarlineDesc { get; set; }
         }
 
@@ -70,9 +70,10 @@ namespace WingandPrayer.MazdaApi
             throw new MazdaApiException("Failed to get vehicle status");
         }
 
+
         public async Task<string> GetAvailableServiceAsync(string internalVin)
         {
-            RawAvailableService result = JsonConvert.DeserializeObject<RawAvailableService>(await _connection.ApiRequestAsync(HttpMethod.Post, "/remoteServices/getAvailableService/v4", $"{{\"internaluserid\": \"__INTERNAL_ID__\", \"internaluseridget\": \"__INTERNAL_ID__\", \"internalvin\": {internalVin}}}", true, true));
+            ApiResult result = JsonConvert.DeserializeObject<ApiResult>(await _connection.ApiRequestAsync(HttpMethod.Post, "/remoteServices/getAvailableService/v4", $"{{\"internaluserid\": \"__INTERNAL_ID__\", \"internaluseridget\": \"__INTERNAL_ID__\", \"internalvin\": {internalVin}}}", true, true));
 
             if ((result?.ResultCode ?? string.Empty) == "200S00")
             {

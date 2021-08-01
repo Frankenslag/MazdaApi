@@ -25,6 +25,7 @@
 // 
 
 using System;
+using System.Collections;
 using System.ComponentModel;
 using System.Linq;
 using Microsoft.Extensions.Configuration;
@@ -39,11 +40,28 @@ namespace Wingandprayer.MazdaApi
 {
     internal class Program
     {
-        private static void DumpObj(object obj)
+        private static void DumpObj(object obj, int indent = 0)
         {
             foreach (PropertyDescriptor descriptor in TypeDescriptor.GetProperties(obj))
             {
-                Console.WriteLine($"{descriptor.Name} = {descriptor.GetValue(obj)}");
+                if (descriptor.PropertyType.GetInterfaces().Contains(typeof(ICollection)))
+                {
+                    Console.WriteLine($"{new string(' ', indent + 1)}{descriptor.Name} =");
+                    // ReSharper disable once PossibleNullReferenceException
+                    foreach (object childObj in (IEnumerable) descriptor.GetValue(obj)!)
+                    {
+                        DumpObj(childObj, indent + 2);
+                    }
+                }
+                else if (descriptor.PropertyType.IsClass && descriptor.PropertyType.Name != "String")
+                {
+                    Console.WriteLine($"{new string(' ', indent + 1)}{descriptor.Name} =");
+                    DumpObj(descriptor.GetValue(obj), indent + 2);
+                }
+                else
+                {
+                    Console.WriteLine($"{new string(' ', indent)}{descriptor.Name} = {descriptor.GetValue(obj)}");
+                }
             }
         }
 
@@ -60,8 +78,15 @@ namespace Wingandprayer.MazdaApi
                 foreach (VehicleModel i in client.GetVehicles())
                 {
                     DumpObj(i);
-                    VehicleStatus vs = client.GetVehicleStatus(i.Id);
-                    DumpObj(vs);
+                    Console.WriteLine();
+                    if (i.Id != null)
+                    {
+                        client.GetAvailableService(i.Id);
+
+                        VehicleStatus vs = client.GetVehicleStatus(i.Id);
+                        DumpObj(vs);
+                        Console.WriteLine();
+                    }
                 }
             }
 

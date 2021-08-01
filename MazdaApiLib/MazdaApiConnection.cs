@@ -187,46 +187,14 @@ namespace WingandPrayer.MazdaApi
             return GetPayloadSign(strTimestampExtended, val2.Substring(20, 12) + val2[..10] + val2.Substring(4, 2));
         }
 
-        private string DecryptPayloadUsingAppCode(string payload)
+        private static string DecryptPayloadUsingKey(string payload, string key)
         {
-            string decryptionKey;
-
-            using (MD5 md5 = MD5.Create())
-            {
-                decryptionKey = HexDigest(md5.ComputeHash(Encoding.UTF8.GetBytes(HexDigest(md5.ComputeHash(Encoding.UTF8.GetBytes(_regionConfig.ApplicationCode + AppPackageId))).ToUpper() + SignatureMd5))).ToLower().Substring(4, 16);
-            }
-
-            using (Aes aes = Aes.Create())
-            {
-                aes.BlockSize = 128;
-                aes.Padding = PaddingMode.PKCS7;
-                aes.Key = Encoding.UTF8.GetBytes(decryptionKey);
-                aes.IV = Encoding.UTF8.GetBytes(Iv);
-
-                // Create an decryptor to perform the stream transform.
-                ICryptoTransform decryptor = aes.CreateDecryptor(aes.Key, aes.IV);
-
-                aes.Mode = CipherMode.CBC;
-
-                // Create the streams used for encryption.
-                using MemoryStream msDecrypt = new(Convert.FromBase64String(payload));
-                using CryptoStream csDecrypt = new(msDecrypt, decryptor, CryptoStreamMode.Read);
-                using (StreamReader sRDecrypt = new(csDecrypt))
-                {
-
-                    return sRDecrypt.ReadToEnd();
-                }
-            }
-        }
-
-        private string DecryptPayloadUsingKey(string payload)
-        {
-            if (!string.IsNullOrWhiteSpace(_encKey))
+            if (!string.IsNullOrWhiteSpace(key))
             {
                 using Aes aes = Aes.Create();
                 aes.BlockSize = 128;
                 aes.Padding = PaddingMode.PKCS7;
-                aes.Key = Encoding.UTF8.GetBytes(_encKey);
+                aes.Key = Encoding.UTF8.GetBytes(key);
                 aes.IV = Encoding.UTF8.GetBytes(Iv);
 
                 // Create an decryptor to perform the stream transform.
@@ -332,10 +300,27 @@ namespace WingandPrayer.MazdaApi
                 {
                     return await SendRawApiRequestAsync(method, uri, body, needsAuth);
                 }
-                catch (Exception e)
+                catch (MazdaApiEncryptionException)
                 {
-                    Console.WriteLine(e);
-                    throw;
+                    CheckVersionResponse checkVersionResponse = JsonSerializer.Deserialize<CheckVersionResponse>(await SendApiRequestAsync(HttpMethod.Post, "/service/checkVersion", null, false, false), new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+                    _encKey = checkVersionResponse?.EncKey;
+                    _signKey = checkVersionResponse?.SignKey;
+                    return await SendApiRequestAsync(method, uri, body, needsKeys, needsAuth, numRetries + 1);
+                }
+                catch (MazdaApiTokenExpiredException)
+                {
+                    await LoginAsync();
+                    return await SendApiRequestAsync(method, uri, body, needsKeys, needsAuth, numRetries + 1);
+                }
+                catch (MazdaApiLoginFailedException)
+                {
+                    await LoginAsync();
+                    return await SendApiRequestAsync(method, uri, body, needsKeys, needsAuth, numRetries + 1);
+                }
+                catch (MazdaApiRequestInProgressException)
+                {
+                    await Task.Delay(30 * 1000);
+                    return await SendApiRequestAsync(method, uri, body, needsKeys, needsAuth, numRetries + 1);
                 }
             }
 
@@ -389,9 +374,22 @@ namespace WingandPrayer.MazdaApi
 
             if (apiResponse?.State == "S")
             {
-                return uri.Contains("checkVersion") ? DecryptPayloadUsingAppCode(apiResponse.Payload) : DecryptPayloadUsingKey(apiResponse.Payload);
+                string key;
+
+                if (uri.Contains("checkVersion"))
+                {
+                    using MD5 md5 = MD5.Create();
+                    key = HexDigest(md5.ComputeHash(Encoding.UTF8.GetBytes(HexDigest(md5.ComputeHash(Encoding.UTF8.GetBytes(_regionConfig.ApplicationCode + AppPackageId))).ToUpper() + SignatureMd5))).ToLower().Substring(4, 16);
+                }
+                else
+                {
+                    key = _encKey;
+                }
+
+                return DecryptPayloadUsingKey(apiResponse.Payload, key);
             }
 
+            // got to here so must be an error.
             switch (apiResponse?.ErrorCode)
             {
                 case 600001:
