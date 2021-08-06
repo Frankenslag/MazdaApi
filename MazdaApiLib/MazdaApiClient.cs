@@ -33,6 +33,7 @@ using WingandPrayer.MazdaApi.Model;
 
 namespace WingandPrayer.MazdaApi
 {
+
     public partial class MazdaApiClient
     {
         private readonly MazdaApiController _controller;

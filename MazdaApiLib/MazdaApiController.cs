@@ -85,11 +85,21 @@ namespace WingandPrayer.MazdaApi
 
         public async Task SetHazzardLightAsync(string internalVin, bool blnLightOn)
         {
-            ApiResult result = JsonConvert.DeserializeObject<ApiResult>(await _connection.ApiRequestAsync(HttpMethod.Post, $"/remoteServices/{(blnLightOn ? "lightOn" : "lightOff")}/v4", $"{{\"internaluserid\": \"__INTERNAL_ID__\", \"vin\": {internalVin}}}", true, true));
+            ApiResult result = JsonConvert.DeserializeObject<ApiResult>(await _connection.ApiRequestAsync(HttpMethod.Post, $"/remoteServices/{(blnLightOn ? "lightOn" : "lightOff")}/v4", $"{{\"internaluserid\": \"__INTERNAL_ID__\", \"internalvin\": {internalVin}}}", true, true));
 
             if ((result?.ResultCode ?? string.Empty) != "200S00")
             {
                 throw new MazdaApiException($"Failed to turn light {(blnLightOn ? "on" : "off")}");
+            }
+        }
+
+        public async Task SetDoorLockAsync(string internalVin, bool blnLock)
+        {
+            ApiResult result = JsonConvert.DeserializeObject<ApiResult>(await _connection.ApiRequestAsync(HttpMethod.Post, $"/remoteServices/{(blnLock ? "doorLock" : "doorUnlock")}/v4", $"{{\"internaluserid\": \"__INTERNAL_ID__\", \"internalvin\": {internalVin}}}", true, true));
+
+            if ((result?.ResultCode ?? string.Empty) != "200S00")
+            {
+                throw new MazdaApiException($"Failed to {(blnLock ? "lock" : "unlock")} door");
             }
         }
 

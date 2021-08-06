@@ -37,7 +37,6 @@ namespace WingandPrayer.MazdaApi
 {
     public partial class MazdaApiClient
     {
-
         public MazdaApiRawVehicleStatus GetRawVehicleStatus(string internalVin) => GetRawVehicleStatusAsync(internalVin).GetAwaiter().GetResult();
 
         public async Task<MazdaApiRawVehicleStatus> GetRawVehicleStatusAsync(string internalVin) => JsonConvert.DeserializeObject<MazdaApiRawVehicleStatus>(await _controller.GetVehicleStatusAsync(internalVin));
@@ -51,7 +50,7 @@ namespace WingandPrayer.MazdaApi
             AlertInfo alertInfo = rawStatus.AlertInfos[0];
             RemoteInfo remoteInfo = rawStatus.RemoteInfos[0];
 
-            return new VehicleStatus
+            VehicleStatus retval = new()
             {
                 LastUpdatedTimestamp = alertInfo.OccurrenceDate,
                 Latitude = remoteInfo.PositionInfo.Latitude * (remoteInfo.PositionInfo.LatitudeFlag == 1 ? -1 : 1),
@@ -59,7 +58,7 @@ namespace WingandPrayer.MazdaApi
                 PositionTimestamp = remoteInfo.PositionInfo.AcquisitionDatetime,
                 FuelRemainingPercent = remoteInfo.ResidualFuel.FuelSegementDActl,
                 FuelDistanceRemainingKm = remoteInfo.ResidualFuel.RemDrvDistDActlKm,
-                OdometerKm = remoteInfo.DriveInformation.OdoDispValue, 
+                OdometerKm = remoteInfo.DriveInformation.OdoDispValue,
                 Doors = new Doors
                 {
                     DriverDoorOpen = alertInfo.Door.DrStatDrv == 1,
@@ -93,6 +92,13 @@ namespace WingandPrayer.MazdaApi
                     RearRightTirePressurePsi = remoteInfo.TpmsInformation.RrtPrsDispPsi
                 }
             };
+
+            CachedLockState lockState = GetCachedLockState(internalVin);
+
+            lockState.ApiLockTimestamp = retval.LastUpdatedTimestamp;
+            lockState.ApiLockState = !(retval.DoorLocks.DriverDoorUnlocked || retval.DoorLocks.PassengerDoorUnlocked || retval.DoorLocks.RearLeftDoorUnlocked || retval.DoorLocks.RearRightDoorUnlocked);
+
+            return retval;
         }
     }
 }

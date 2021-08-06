@@ -30,6 +30,7 @@ namespace WingandPrayer.MazdaApi.Model
     {
         public string Vin { get; set; }
         public string Id { get; set; }
+        public int VinRegistStatus { get; set; }
         public string Nickname { get; set; }
         public string CarlineCode { get; set; }
         public string CarlineName { get; set; }

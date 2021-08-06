@@ -74,16 +74,24 @@ namespace Wingandprayer.MazdaApi
             {
                 MazdaApiClient client = new(email, secret, region);
 
+                var v = client.GetRawVehicles();
+
                 // ReSharper disable once ForeachCanBePartlyConvertedToQueryUsingAnotherGetEnumerator
                 foreach (VehicleModel i in client.GetVehicles())
                 {
                     DumpObj(i);
                     Console.WriteLine();
-                    if (i.Id != null)
+
+                    if (i.VinRegistStatus == 3)
                     {
                         client.GetAvailableService(i.Id);
 
                         VehicleStatus vs = client.GetVehicleStatus(i.Id);
+                        client.LockDoor(i.Id);
+
+                        var z = client.GetAssumedLockState(i.Id);
+
+                        client.LockDoor(i.Id);
                         DumpObj(vs);
                         Console.WriteLine();
                     }

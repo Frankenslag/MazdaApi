@@ -59,26 +59,34 @@ namespace WingandPrayer.MazdaApi
         {
             List<VehicleModel> retval = new();
 
-            foreach (MazdaApiRawVehicleBaseInfo baseInfo in (await GetRawVehiclesAsync()).VecBaseInfos)
+            MazdaApiVehicles vehicles = await GetRawVehiclesAsync();
+
+            for (int i = 0; i < vehicles.VecBaseInfos.Count; i++)
             {
+                MazdaApiRawVehicleBaseInfo baseInfo = vehicles.VecBaseInfos[i];
                 MazdaApiVehicleOtherInformation otherInformation = baseInfo.Vehicle.VehicleInformation.OtherInformation;
 
-                retval.Add(new VehicleModel
+                if (vehicles.VehicleFlags[i].VinRegistStatus is 1 or 3)
                 {
-                    Vin = baseInfo.Vin,
-                    Id = baseInfo.Vehicle.CvInformation.InternalVin,
-                    Nickname = await _controller.GetNicknameAsync(baseInfo.Vin),
-                    CarlineCode = otherInformation.CarlineCode,
-                    CarlineName = otherInformation.CarlineName,
-                    ModelYear = otherInformation.ModelYear,
-                    ModelCode = otherInformation.ModelCode,
-                    ModelName = otherInformation.ModelName,
-                    AutomaticTransmission = otherInformation.TransmissionType == "A",
-                    InteriorColorCode = otherInformation.InteriorColorCode,
-                    InteriorColorName = otherInformation.InteriorColorName,
-                    ExteriorColorCode = otherInformation.ExteriorColorCode,
-                    ExteriorColorName = otherInformation.ExteriorColorName
-                });
+                    retval.Add(new VehicleModel
+                    {
+                        Vin = baseInfo.Vin,
+                        Id = baseInfo.Vehicle.CvInformation.InternalVin,
+                        VinRegistStatus = vehicles.VehicleFlags[i].VinRegistStatus,
+                        Nickname = await _controller.GetNicknameAsync(baseInfo.Vin),
+                        CarlineCode = otherInformation.CarlineCode,
+                        CarlineName = otherInformation.CarlineName,
+                        ModelYear = otherInformation.ModelYear,
+                        ModelCode = otherInformation.ModelCode,
+                        ModelName = otherInformation.ModelName,
+                        AutomaticTransmission = otherInformation.TransmissionType == "A",
+                        InteriorColorCode = otherInformation.InteriorColorCode,
+                        InteriorColorName = otherInformation.InteriorColorName,
+                        ExteriorColorCode = otherInformation.ExteriorColorCode,
+                        ExteriorColorName = otherInformation.ExteriorColorName
+                    });
+                }
+
             }
 
             return retval;

@@ -130,10 +130,17 @@ namespace WingandPrayer.MazdaApi.RawModel
         public string VehicleType { get; set; }
     }
 
+    public class VehicleFlags
+    {
+        public int VinRegistStatus { get; set; }
+        public int PrimaryFlag { get; set; }
+    }
+
     public class MazdaApiVehicles
     {
         public string ResultCode { get; set; }
         //[JsonPropertyName("vecBaseInfos")]
         public List<MazdaApiRawVehicleBaseInfo> VecBaseInfos { get; set; }
+        public List<VehicleFlags> VehicleFlags { get; set; }
     }
 }
