@@ -77,21 +77,19 @@ namespace Wingandprayer.MazdaApi
                 var v = client.GetRawVehicles();
 
                 // ReSharper disable once ForeachCanBePartlyConvertedToQueryUsingAnotherGetEnumerator
-                foreach (VehicleModel i in client.GetVehicles())
+                foreach (VehicleModel vehicle in client.GetVehicles())
                 {
-                    DumpObj(i);
+                    DumpObj(vehicle);
                     Console.WriteLine();
 
-                    if (i.VinRegistStatus == 3)
+                    if (vehicle.VinRegistStatus == 3)
                     {
-                        client.GetAvailableService(i.Id);
+                        client.GetAvailableService(vehicle.Id);
 
-                        VehicleStatus vs = client.GetVehicleStatus(i.Id);
-                        client.LockDoor(i.Id);
+                        VehicleStatus vs = client.GetVehicleStatus(vehicle.Id);
 
-                        var z = client.GetAssumedLockState(i.Id);
+                        var p = client.GetRemotePermissions(vehicle.Vin);
 
-                        client.LockDoor(i.Id);
                         DumpObj(vs);
                         Console.WriteLine();
                     }

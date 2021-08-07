@@ -26,7 +26,6 @@
 
 using System;
 using System.Collections.Generic;
-
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 
@@ -62,7 +61,8 @@ namespace WingandPrayer.MazdaApi.RawModel
     public class PositionInfo
     {
         [JsonConverter(typeof(StampDateTimeConverter))]
-        public DateTime  AcquisitionDatetime { get; set; }
+        public DateTime AcquisitionDatetime { get; set; }
+
         public double Latitude { get; set; }
         public int LatitudeFlag { get; set; }
         public int LongitudeFlag { get; set; }
@@ -98,10 +98,7 @@ namespace WingandPrayer.MazdaApi.RawModel
 
     internal class StampDateTimeConverter : IsoDateTimeConverter
     {
-        public StampDateTimeConverter()
-        {
-            DateTimeFormat = "yyyyMMddHHmmss";
-        }
+        public StampDateTimeConverter() => DateTimeFormat = "yyyyMMddHHmmss";
     }
 
     public class AlertInfo
@@ -110,8 +107,10 @@ namespace WingandPrayer.MazdaApi.RawModel
         public VehicleCondition VehicleCondition { get; set; }
         public HazardLamp HazardLamp { get; set; }
         public Pw Pw { get; set; }
+
         [JsonConverter(typeof(StampDateTimeConverter))]
         public DateTime OccurrenceDate { get; set; }
+
         public PositionInfo PositionInfo { get; set; }
         public int PositionInfoCategory { get; set; }
         public Door Door { get; set; }

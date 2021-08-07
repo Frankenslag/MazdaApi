@@ -25,11 +25,9 @@
 // 
 
 using System.Threading.Tasks;
-
+using Newtonsoft.Json;
 using WingandPrayer.MazdaApi.Model;
 using WingandPrayer.MazdaApi.RawModel;
-
-using Newtonsoft.Json;
 
 // ReSharper disable UnusedMember.Global
 

@@ -26,11 +26,9 @@
 
 using System.Collections.Generic;
 using System.Threading.Tasks;
-
+using Newtonsoft.Json;
 using WingandPrayer.MazdaApi.Model;
 using WingandPrayer.MazdaApi.RawModel;
-
-using Newtonsoft.Json;
 
 // ReSharper disable UnusedMember.Global
 
@@ -45,10 +43,7 @@ namespace WingandPrayer.MazdaApi
 
         public async Task<MazdaApiVehicles> GetRawVehiclesAsync()
         {
-            if (_vehicleCache == null || !_useCachedVehicleList)
-            {
-                _vehicleCache = JsonConvert.DeserializeObject<MazdaApiVehicles>(await _controller.GetVehicleBaseInformationAsync());
-            }
+            if (_vehicleCache == null || !_useCachedVehicleList) _vehicleCache = JsonConvert.DeserializeObject<MazdaApiVehicles>(await _controller.GetVehicleBaseInformationAsync());
 
             return _vehicleCache;
         }
@@ -67,7 +62,6 @@ namespace WingandPrayer.MazdaApi
                 MazdaApiVehicleOtherInformation otherInformation = baseInfo.Vehicle.VehicleInformation.OtherInformation;
 
                 if (vehicles.VehicleFlags[i].VinRegistStatus is 1 or 3)
-                {
                     retval.Add(new VehicleModel
                     {
                         Vin = baseInfo.Vin,
@@ -85,8 +79,6 @@ namespace WingandPrayer.MazdaApi
                         ExteriorColorCode = otherInformation.ExteriorColorCode,
                         ExteriorColorName = otherInformation.ExteriorColorName
                     });
-                }
-
             }
 
             return retval;

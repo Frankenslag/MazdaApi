@@ -1,5 +1,5 @@
 ﻿// 
-// AvailableService.cs
+// RemotePermissions.cs
 // 
 // MIT License
 // 
@@ -24,24 +24,49 @@
 // SOFTWARE.
 // 
 
-using Newtonsoft.Json;
-
 // ReSharper disable UnusedMember.Global
 
 namespace WingandPrayer.MazdaApi.Model
 {
-    public class AvailableService
+    public class EConnectRemoteHvac
     {
-        [JsonConverter(typeof(BoolConverter))] public bool VehicleStatus { get; set; }
+        public int AirConditioningOn { get; set; }
+        public int AirConditioningOff { get; set; }
+    }
 
-        [JsonConverter(typeof(BoolConverter))] public bool RemoteControl { get; set; }
+    public class Charge
+    {
+        public int ImmediatelyCharge { get; set; }
+        public int StopPowerSupply { get; set; }
+    }
 
-        [JsonConverter(typeof(BoolConverter))] public bool VehicleFinder { get; set; }
+    public class DoorLock
+    {
+        public int LockBaguraSetOff { get; set; }
+        public int LockBaguraSetOn { get; set; }
+        public int UnLock { get; set; }
+        public int RemoteLockCancel { get; set; }
+    }
 
-        [JsonConverter(typeof(BoolConverter))] public bool PoiSendToCar { get; set; }
+    public class Hazard
+    {
+        public int HazardOffCancel { get; set; }
+        public int CarFinder { get; set; }
+        public int HazardOff { get; set; }
+    }
 
-        [JsonConverter(typeof(BoolConverter))] public bool HealthReports { get; set; }
+    public class RemoteHvac
+    {
+        public int EngineOff { get; set; }
+        public int EngineOn { get; set; }
+    }
 
-        [JsonConverter(typeof(BoolConverter))] public bool VehicleStatusAlert { get; set; }
+    public class RemoteControlPermissions
+    {
+        public EConnectRemoteHvac EConnectRemoteHvac { get; set; }
+        public Charge Charge { get; set; }
+        public DoorLock DoorLock { get; set; }
+        public Hazard Hazard { get; set; }
+        public RemoteHvac RemoteHvac { get; set; }
     }
 }

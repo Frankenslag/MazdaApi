@@ -30,24 +30,16 @@ using System.Diagnostics.CodeAnalysis;
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
-
 using Newtonsoft.Json;
-
 using WingandPrayer.MazdaApi.Exceptions;
 
 namespace WingandPrayer.MazdaApi
 {
     internal class MazdaApiController
     {
-        [SuppressMessage("ReSharper", "UnusedAutoPropertyAccessor.Local")]
-        private class ApiResult
-        {
-            public string ResultCode { get; set; }
-            public string AvailableService { get; set; }
-            public string CarlineDesc { get; set; }
-        }
-
         private readonly MazdaApiConnection _connection;
+
+        public MazdaApiController(string emailAddress, string password, string region) => _connection = new MazdaApiConnection(emailAddress, password, region);
 
         private static bool CheckResult(string json)
         {
@@ -56,29 +48,31 @@ namespace WingandPrayer.MazdaApi
             return (result?.ResultCode ?? string.Empty) == "200S00";
         }
 
-        public async Task<string>GetVehicleBaseInformationAsync() => await _connection.ApiRequestAsync(HttpMethod.Post, "/remoteServices/getVecBaseInfos/v4", new Dictionary<string, string> { { "internaluserid", "__INTERNAL_ID__" } }, true, true);
+        public async Task<string> GetVehicleBaseInformationAsync() => await _connection.ApiRequestAsync(HttpMethod.Post, "/remoteServices/getVecBaseInfos/v4", new Dictionary<string, string> { { "internaluserid", "__INTERNAL_ID__" } }, true, true);
 
         public async Task<string> GetVehicleStatusAsync(string internalVin)
         {
             string json = await _connection.ApiRequestAsync(HttpMethod.Post, "/remoteServices/getVehicleStatus/v4", $"{{\"internaluserid\": \"__INTERNAL_ID__\", \"internalvin\": {internalVin}, \"limit\": 1, \"offset\": 0, \"vecinfotype\": \"0\" }}", true, true);
 
-            if (CheckResult(json))
-            {
-                return json;
-            }
+            if (CheckResult(json)) return json;
 
             throw new MazdaApiException("Failed to get vehicle status");
         }
 
+        public async Task<string> GetRemotePermissionsAsync(string vin)
+        {
+            ApiResult result = JsonConvert.DeserializeObject<ApiResult>(await _connection.ApiRequestAsync(HttpMethod.Post, "/remoteServices/getRemoteControlPermission/v4", $"{{\"internaluserid\": \"__INTERNAL_ID__\", \"vin\": \"{vin}\"}}", true, true));
+
+            if ((result?.ResultCode ?? string.Empty) == "200S00") return result?.RemoteControl.ToString() ?? string.Empty;
+
+            throw new MazdaApiException("Failed to get remote permissions");
+        }
 
         public async Task<string> GetAvailableServiceAsync(string internalVin)
         {
             ApiResult result = JsonConvert.DeserializeObject<ApiResult>(await _connection.ApiRequestAsync(HttpMethod.Post, "/remoteServices/getAvailableService/v4", $"{{\"internaluserid\": \"__INTERNAL_ID__\", \"internaluseridget\": \"__INTERNAL_ID__\", \"internalvin\": {internalVin}}}", true, true));
 
-            if ((result?.ResultCode ?? string.Empty) == "200S00")
-            {
-                return Encoding.UTF8.GetString(Convert.FromBase64String(result?.AvailableService ?? string.Empty));
-            }
+            if ((result?.ResultCode ?? string.Empty) == "200S00") return Encoding.UTF8.GetString(Convert.FromBase64String(result?.AvailableService ?? string.Empty));
 
             throw new MazdaApiException("Failed to get available service");
         }
@@ -87,20 +81,14 @@ namespace WingandPrayer.MazdaApi
         {
             ApiResult result = JsonConvert.DeserializeObject<ApiResult>(await _connection.ApiRequestAsync(HttpMethod.Post, $"/remoteServices/{(blnLightOn ? "lightOn" : "lightOff")}/v4", $"{{\"internaluserid\": \"__INTERNAL_ID__\", \"internalvin\": {internalVin}}}", true, true));
 
-            if ((result?.ResultCode ?? string.Empty) != "200S00")
-            {
-                throw new MazdaApiException($"Failed to turn light {(blnLightOn ? "on" : "off")}");
-            }
+            if ((result?.ResultCode ?? string.Empty) != "200S00") throw new MazdaApiException($"Failed to turn light {(blnLightOn ? "on" : "off")}");
         }
 
         public async Task SetDoorLockAsync(string internalVin, bool blnLock)
         {
             ApiResult result = JsonConvert.DeserializeObject<ApiResult>(await _connection.ApiRequestAsync(HttpMethod.Post, $"/remoteServices/{(blnLock ? "doorLock" : "doorUnlock")}/v4", $"{{\"internaluserid\": \"__INTERNAL_ID__\", \"internalvin\": {internalVin}}}", true, true));
 
-            if ((result?.ResultCode ?? string.Empty) != "200S00")
-            {
-                throw new MazdaApiException($"Failed to {(blnLock ? "lock" : "unlock")} door");
-            }
+            if ((result?.ResultCode ?? string.Empty) != "200S00") throw new MazdaApiException($"Failed to {(blnLock ? "lock" : "unlock")} door");
         }
 
         public async Task<string> GetNicknameAsync(string vin)
@@ -109,10 +97,7 @@ namespace WingandPrayer.MazdaApi
             {
                 ApiResult result = JsonConvert.DeserializeObject<ApiResult>(await _connection.ApiRequestAsync(HttpMethod.Post, "/remoteServices/getNickName/v4", $"{{\"internaluserid\": \"__INTERNAL_ID__\", \"vin\": \"{vin}\"}}", true, true));
 
-                if ((result?.ResultCode ?? string.Empty) == "200S00")
-                {
-                    return result?.CarlineDesc;
-                }
+                if ((result?.ResultCode ?? string.Empty) == "200S00") return result?.CarlineDesc;
 
                 throw new MazdaApiException("Failed to get vehicle nickname");
             }
@@ -120,9 +105,13 @@ namespace WingandPrayer.MazdaApi
             throw new MazdaApiException("Invalid VIN");
         }
 
-        public MazdaApiController(string emailAddress, string password, string region)
+        [SuppressMessage("ReSharper", "UnusedAutoPropertyAccessor.Local")]
+        private class ApiResult
         {
-            _connection = new MazdaApiConnection(emailAddress, password, region);
+            public string ResultCode { get; set; }
+            public string AvailableService { get; set; }
+            public string CarlineDesc { get; set; }
+            public object RemoteControl { get; set; }
         }
     }
 }

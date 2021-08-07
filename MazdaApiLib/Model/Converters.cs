@@ -1,5 +1,5 @@
 ﻿// 
-// AvailableService.cs
+// Converters.cs
 // 
 // MIT License
 // 
@@ -24,24 +24,20 @@
 // SOFTWARE.
 // 
 
+using System;
 using Newtonsoft.Json;
-
-// ReSharper disable UnusedMember.Global
 
 namespace WingandPrayer.MazdaApi.Model
 {
-    public class AvailableService
+    public class BoolConverter : JsonConverter
     {
-        [JsonConverter(typeof(BoolConverter))] public bool VehicleStatus { get; set; }
+        public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
+        {
+            writer.WriteValue((bool)value ? 1 : 0);
+        }
 
-        [JsonConverter(typeof(BoolConverter))] public bool RemoteControl { get; set; }
+        public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer) => reader.Value!.ToString() == "1";
 
-        [JsonConverter(typeof(BoolConverter))] public bool VehicleFinder { get; set; }
-
-        [JsonConverter(typeof(BoolConverter))] public bool PoiSendToCar { get; set; }
-
-        [JsonConverter(typeof(BoolConverter))] public bool HealthReports { get; set; }
-
-        [JsonConverter(typeof(BoolConverter))] public bool VehicleStatusAlert { get; set; }
+        public override bool CanConvert(Type objectType) => objectType == typeof(bool);
     }
 }

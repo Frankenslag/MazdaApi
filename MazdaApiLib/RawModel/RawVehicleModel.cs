@@ -26,7 +26,6 @@
 
 using System;
 using System.Collections.Generic;
-
 using Newtonsoft.Json;
 
 // ReSharper disable UnusedMember.Global
@@ -93,15 +92,9 @@ namespace WingandPrayer.MazdaApi.RawModel
             writer.WriteValue(value);
         }
 
-        public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
-        {
-            return JsonConvert.DeserializeObject<MazdaApiVehicleInformation>((string)reader.Value ?? string.Empty);
-        }
+        public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer) => JsonConvert.DeserializeObject<MazdaApiVehicleInformation>((string)reader.Value ?? string.Empty);
 
-        public override bool CanConvert(Type objectType)
-        {
-            return true;
-        }
+        public override bool CanConvert(Type objectType) => true;
     }
 
     public class MazdaApiVehicle
@@ -116,8 +109,10 @@ namespace WingandPrayer.MazdaApi.RawModel
         public string RsaPhoneNumberDomestic { get; set; }
         public string RsaStatus { get; set; }
         public string CountryCode { get; set; }
+
         [JsonConverter(typeof(VehicleInfoConverter))]
         public MazdaApiVehicleInformation VehicleInformation { get; set; }
+
         public MazdaApiVehicleCvInformation CvInformation { get; set; }
     }
 
@@ -139,7 +134,6 @@ namespace WingandPrayer.MazdaApi.RawModel
     public class MazdaApiVehicles
     {
         public string ResultCode { get; set; }
-        //[JsonPropertyName("vecBaseInfos")]
         public List<MazdaApiRawVehicleBaseInfo> VecBaseInfos { get; set; }
         public List<VehicleFlags> VehicleFlags { get; set; }
     }

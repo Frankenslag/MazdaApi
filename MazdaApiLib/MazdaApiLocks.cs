@@ -35,28 +35,24 @@ namespace WingandPrayer.MazdaApi
     internal class CachedLockState
     {
         public bool? ApiLockState { get; set; }
+
         public bool? RequestedLockState { get; set; }
 
         public DateTime ApiLockTimestamp { get; set; } = DateTime.MinValue;
 
         public DateTime RequestedLockTimestamp { get; set; } = DateTime.MinValue;
 
-        public bool? AssumedLockState {
+        public bool? AssumedLockState
+        {
             get
             {
                 if (ApiLockState is not null || RequestedLockState is not null)
                 {
                     // only have the requested lock state
-                    if (ApiLockState is not null && RequestedLockState is null)
-                    {
-                        return ApiLockState;
-                    }
-                    
+                    if (ApiLockState is not null && RequestedLockState is null) return ApiLockState;
+
                     // only have the api lock state
-                    if (ApiLockState is null)
-                    {
-                        return RequestedLockState;
-                    }
+                    if (ApiLockState is null) return RequestedLockState;
 
                     // we have both lock states available chose the most appropriate
                     return RequestedLockTimestamp > ApiLockTimestamp && (DateTime.UtcNow - RequestedLockTimestamp).TotalSeconds < 600 ? RequestedLockState : ApiLockState;
@@ -73,10 +69,7 @@ namespace WingandPrayer.MazdaApi
 
         private CachedLockState GetCachedLockState(string internalVin)
         {
-            if (!_lockStates.ContainsKey(internalVin))
-            {
-                _lockStates.Add(internalVin, new CachedLockState());
-            }
+            if (!_lockStates.ContainsKey(internalVin)) _lockStates.Add(internalVin, new CachedLockState());
 
             return _lockStates[internalVin];
         }
