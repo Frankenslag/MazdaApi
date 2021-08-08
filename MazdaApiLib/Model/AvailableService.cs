@@ -32,16 +32,22 @@ namespace WingandPrayer.MazdaApi.Model
 {
     public class AvailableService
     {
-        [JsonConverter(typeof(BoolConverter))] public bool VehicleStatus { get; set; }
+        [JsonConverter(typeof(BoolConverter))] 
+        public bool VehicleStatus { get; set; }
 
-        [JsonConverter(typeof(BoolConverter))] public bool RemoteControl { get; set; }
+        [JsonConverter(typeof(BoolConverter))]
+        public bool RemoteControl { get; set; }
 
-        [JsonConverter(typeof(BoolConverter))] public bool VehicleFinder { get; set; }
+        [JsonConverter(typeof(BoolConverter))]
+        public bool VehicleFinder { get; set; }
 
-        [JsonConverter(typeof(BoolConverter))] public bool PoiSendToCar { get; set; }
+        [JsonConverter(typeof(BoolConverter))]
+        public bool PoiSendToCar { get; set; }
 
-        [JsonConverter(typeof(BoolConverter))] public bool HealthReports { get; set; }
+        [JsonConverter(typeof(BoolConverter))]
+        public bool HealthReports { get; set; }
 
-        [JsonConverter(typeof(BoolConverter))] public bool VehicleStatusAlert { get; set; }
+        [JsonConverter(typeof(BoolConverter))]
+        public bool VehicleStatusAlert { get; set; }
     }
 }

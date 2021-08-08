@@ -45,20 +45,14 @@ namespace WingandPrayer.MazdaApi.SensorData
             ToolType = toolType;
         }
 
-        public override string ToString()
-        {
-            return $"{EventType},{EventTime},0,0,{PointerCount},1,{ToolType},-1;";
-        }
+        public override string ToString() => $"{EventType},{EventTime},0,0,{PointerCount},1,{ToolType},-1;";
     }
 
     internal class TouchEvents
     {
         private readonly List<TouchEvent> _touchEvents;
 
-        public TouchEvents()
-        {
-            _touchEvents = new List<TouchEvent>();
-        }
+        public TouchEvents() => _touchEvents = new List<TouchEvent>();
 
         public void Randomize(DateTime sensorCollectionStartTimestamp)
         {

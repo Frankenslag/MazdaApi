@@ -30,6 +30,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using WingandPrayer.MazdaApi.Exceptions;
 
@@ -39,7 +40,7 @@ namespace WingandPrayer.MazdaApi
     {
         private readonly MazdaApiConnection _connection;
 
-        public MazdaApiController(string emailAddress, string password, string region) => _connection = new MazdaApiConnection(emailAddress, password, region);
+        public MazdaApiController(string emailAddress, string password, string region, ILogger<MazdaApiClient> logger) => _connection = new MazdaApiConnection(emailAddress, password, region, logger);
 
         private static bool CheckResult(string json)
         {

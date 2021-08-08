@@ -41,20 +41,14 @@ namespace WingandPrayer.MazdaApi.SensorData
             EventTime = eventTime;
         }
 
-        public override string ToString()
-        {
-            return $"{EventType},{EventTime}";
-        }
+        public override string ToString() => $"{EventType},{EventTime}";
     }
 
     internal class BackgroundEvents
     {
         private readonly List<BackgroundEvent> _backgroundEvents;
 
-        public BackgroundEvents()
-        {
-            _backgroundEvents = new List<BackgroundEvent>();
-        }
+        public BackgroundEvents() => _backgroundEvents = new List<BackgroundEvent>();
 
         public void Randomize(DateTime sensorCollectionStartTimestamp)
         {

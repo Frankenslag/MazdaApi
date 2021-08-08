@@ -29,7 +29,10 @@ using System.Collections;
 using System.ComponentModel;
 using System.Linq;
 using Microsoft.Extensions.Configuration;
-
+using Microsoft.Extensions.Configuration.Json;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 using WingandPrayer.MazdaApi;
 using WingandPrayer.MazdaApi.Model;
 
@@ -67,15 +70,46 @@ namespace Wingandprayer.MazdaApi
 
         private static void Main(string[] args)
         {
-            IConfigurationRoot config = new ConfigurationBuilder().AddUserSecrets<Program>().Build();
-            IConfigurationProvider secretProvider = config.Providers.First();
-
-            if (secretProvider.TryGet("TestCredentials:Email", out string email) && secretProvider.TryGet("TestCredentials:Secret", out string secret) & secretProvider.TryGet("TestCredentials:Region", out string region))
+            // create a service host. Done so that logging and user secrets are included as services.
+            IHost serviceHost = Host.CreateDefaultBuilder().ConfigureServices((hostContext, services) =>
             {
-                MazdaApiClient client = new(email, secret, region);
+                services.AddTransient(s =>
+                {
+                    MazdaApiClient retval = null;
+                    
+                    ILogger<IHost> logger = s.GetRequiredService<ILogger<IHost>>();
 
-                var v = client.GetRawVehicles();
+                    IConfigurationRoot configRoot = s.GetRequiredService<IConfiguration>() as IConfigurationRoot;
+                    IConfigurationProvider secretProvider = configRoot?.Providers.FirstOrDefault(provider => ((provider as JsonConfigurationProvider)?.Source.Path ?? string.Empty) == @"secrets.json");
 
+                    if (secretProvider != null)
+                    {
+                        if (secretProvider.TryGet("TestCredentials:Email", out string email) && secretProvider.TryGet("TestCredentials:Secret", out string secret) & secretProvider.TryGet("TestCredentials:Region", out string region))
+                        {
+                            retval = new MazdaApiClient(email, secret, region, logger: s.GetRequiredService<ILogger<MazdaApiClient>>());
+                        }
+                        else
+                        {
+                            logger.LogError("Cannot get email, secret or region from the user secrets file");
+                        }
+                    }
+                    else
+                    {
+                        logger.LogError("Cannot get the user secrets file");
+                    }
+
+                    return retval;
+                });
+            }).ConfigureAppConfiguration((hostContext, services) =>
+            {
+                // done to force the loading of user secrets even in release mode. Should be ok for a test harness.
+                services.AddUserSecrets<Program>();
+            }).Build();
+
+            MazdaApiClient client = serviceHost.Services.GetService<MazdaApiClient>();
+
+            if (client is not null)
+            {
                 // ReSharper disable once ForeachCanBePartlyConvertedToQueryUsingAnotherGetEnumerator
                 foreach (VehicleModel vehicle in client.GetVehicles())
                 {
@@ -87,10 +121,8 @@ namespace Wingandprayer.MazdaApi
                         client.GetAvailableService(vehicle.Id);
 
                         VehicleStatus vs = client.GetVehicleStatus(vehicle.Id);
-
-                        var p = client.GetRemotePermissions(vehicle.Vin);
-
                         DumpObj(vs);
+
                         Console.WriteLine();
                     }
                 }

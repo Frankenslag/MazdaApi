@@ -25,6 +25,7 @@
 // 
 
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using WingandPrayer.MazdaApi.Exceptions;
 using WingandPrayer.MazdaApi.Model;
@@ -37,13 +38,13 @@ namespace WingandPrayer.MazdaApi
     {
         private readonly MazdaApiController _controller;
 
-        public MazdaApiClient(string emailAddress, string password, string region, bool useCachedVehicleList = false)
+        public MazdaApiClient(string emailAddress, string password, string region, bool useCachedVehicleList = false, ILogger<MazdaApiClient> logger = null)
         {
             if (!string.IsNullOrWhiteSpace(emailAddress))
             {
                 if (!string.IsNullOrWhiteSpace(password))
                 {
-                    _controller = new MazdaApiController(emailAddress, password, region);
+                    _controller = new MazdaApiController(emailAddress, password, region, logger);
                     _useCachedVehicleList = useCachedVehicleList;
                 }
                 else
@@ -65,24 +66,12 @@ namespace WingandPrayer.MazdaApi
 
         public async Task<AvailableService> GetAvailableServiceAsync(string internalVin) => JsonConvert.DeserializeObject<AvailableService>(await _controller.GetAvailableServiceAsync(internalVin));
 
-        public void TurnOnHazzardLights(string internalVin)
-        {
-            TurnOnHazzardLightsAsync(internalVin).Wait();
-        }
+        public void TurnOnHazzardLights(string internalVin) => TurnOnHazzardLightsAsync(internalVin).Wait();
 
-        public void TurnOffHazzardLights(string internalVin)
-        {
-            TurnOffHazzardLightsAsync(internalVin).Wait();
-        }
+        public void TurnOffHazzardLights(string internalVin) => TurnOffHazzardLightsAsync(internalVin).Wait();
 
-        public async Task TurnOnHazzardLightsAsync(string internalVin)
-        {
-            await _controller.SetHazzardLightAsync(internalVin, true);
-        }
+        public async Task TurnOnHazzardLightsAsync(string internalVin) => await _controller.SetHazzardLightAsync(internalVin, true);
 
-        public async Task TurnOffHazzardLightsAsync(string internalVin)
-        {
-            await _controller.SetHazzardLightAsync(internalVin, false);
-        }
+        public async Task TurnOffHazzardLightsAsync(string internalVin) => await _controller.SetHazzardLightAsync(internalVin, false);
     }
 }

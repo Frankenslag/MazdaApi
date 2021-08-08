@@ -26,39 +26,54 @@
 
 // ReSharper disable UnusedMember.Global
 
+using Newtonsoft.Json;
+
 namespace WingandPrayer.MazdaApi.Model
 {
     public class EConnectRemoteHvac
     {
-        public int AirConditioningOn { get; set; }
-        public int AirConditioningOff { get; set; }
+        [JsonConverter(typeof(BoolConverter))]
+        public bool AirConditioningOn { get; set; }
+        [JsonConverter(typeof(BoolConverter))]
+        public bool AirConditioningOff { get; set; }
     }
 
     public class Charge
     {
-        public int ImmediatelyCharge { get; set; }
-        public int StopPowerSupply { get; set; }
+        [JsonConverter(typeof(BoolConverter))]
+        public bool ImmediatelyCharge { get; set; }
+        [JsonConverter(typeof(BoolConverter))]
+        public bool StopPowerSupply { get; set; }
     }
 
     public class DoorLock
     {
-        public int LockBaguraSetOff { get; set; }
-        public int LockBaguraSetOn { get; set; }
-        public int UnLock { get; set; }
-        public int RemoteLockCancel { get; set; }
+        [JsonConverter(typeof(BoolConverter))]
+        public bool LockBaguraSetOff { get; set; }
+        [JsonConverter(typeof(BoolConverter))]
+        public bool LockBaguraSetOn { get; set; }
+        [JsonConverter(typeof(BoolConverter))]
+        public bool UnLock { get; set; }
+        [JsonConverter(typeof(BoolConverter))]
+        public bool RemoteLockCancel { get; set; }
     }
 
     public class Hazard
     {
-        public int HazardOffCancel { get; set; }
-        public int CarFinder { get; set; }
-        public int HazardOff { get; set; }
+        [JsonConverter(typeof(BoolConverter))]
+        public bool HazardOffCancel { get; set; }
+        [JsonConverter(typeof(BoolConverter))]
+        public bool CarFinder { get; set; }
+        [JsonConverter(typeof(BoolConverter))]
+        public bool HazardOff { get; set; }
     }
 
     public class RemoteHvac
     {
-        public int EngineOff { get; set; }
-        public int EngineOn { get; set; }
+        [JsonConverter(typeof(BoolConverter))]
+        public bool EngineOff { get; set; }
+        [JsonConverter(typeof(BoolConverter))]
+        public bool EngineOn { get; set; }
     }
 
     public class RemoteControlPermissions

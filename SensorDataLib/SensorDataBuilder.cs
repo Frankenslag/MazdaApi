@@ -121,10 +121,7 @@ namespace WingandPrayer.MazdaApi.SensorData
 
         private static long FeistelCipher(uint upper32, uint lower32, long key)
         {
-            static int Iterate(int arg1, int arg2, int arg3)
-            {
-                return arg1 ^ (arg2 >> (32 - arg3) | (arg2 << arg3));
-            }
+            static int Iterate(int arg1, int arg2, int arg3) => arg1 ^ (arg2 >> (32 - arg3) | (arg2 << arg3));
 
             int lower = (int)lower32;
             int upper = (int)upper32;

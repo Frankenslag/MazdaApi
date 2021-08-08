@@ -43,20 +43,14 @@ namespace WingandPrayer.MazdaApi.SensorData
             LongerThenBefore = longerThenBefore;
         }
 
-        public override string ToString()
-        {
-            return $"2,{EventTime},{CharCodeSum}{(LongerThenBefore ? ",1" : string.Empty)};";
-        }
+        public override string ToString() => $"2,{EventTime},{CharCodeSum}{(LongerThenBefore ? ",1" : string.Empty)};";
     }
 
     internal class KeyEvents
     {
         private readonly List<KeyEvent> _keyEvents;
 
-        public KeyEvents()
-        {
-            _keyEvents = new List<KeyEvent>();
-        }
+        public KeyEvents() => _keyEvents = new List<KeyEvent>();
 
         public void Randomize(DateTime sensorCollectionStartTimestamp)
         {
