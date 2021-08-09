@@ -48,7 +48,7 @@ namespace WingandPrayer.MazdaApi
             AlertInfo alertInfo = rawStatus.AlertInfos[0];
             RemoteInfo remoteInfo = rawStatus.RemoteInfos[0];
 
-            VehicleStatus retval = new()
+            VehicleStatus retval = new VehicleStatus()
             {
                 LastUpdatedTimestamp = alertInfo.OccurrenceDate,
                 Latitude = remoteInfo.PositionInfo.Latitude * (remoteInfo.PositionInfo.LatitudeFlag == 1 ? -1 : 1),

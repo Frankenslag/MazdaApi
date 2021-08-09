@@ -52,7 +52,7 @@ namespace WingandPrayer.MazdaApi
 
         public async Task<List<VehicleModel>> GetVehiclesAsync()
         {
-            List<VehicleModel> retval = new();
+            List<VehicleModel> retval = new List<VehicleModel>();
 
             MazdaApiVehicles vehicles = await GetRawVehiclesAsync();
 
@@ -61,7 +61,7 @@ namespace WingandPrayer.MazdaApi
                 MazdaApiRawVehicleBaseInfo baseInfo = vehicles.VecBaseInfos[i];
                 MazdaApiVehicleOtherInformation otherInformation = baseInfo.Vehicle.VehicleInformation.OtherInformation;
 
-                if (vehicles.VehicleFlags[i].VinRegistStatus is 1 or 3)
+                if (vehicles.VehicleFlags[i].VinRegistStatus == 1 || vehicles.VehicleFlags[i].VinRegistStatus == 3)
                     retval.Add(new VehicleModel
                     {
                         Vin = baseInfo.Vin,

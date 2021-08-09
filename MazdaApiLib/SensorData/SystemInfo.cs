@@ -35,7 +35,7 @@ namespace WingandPrayer.MazdaApi.SensorData
     {
         private readonly int[,] _screenSizes = {{ 1280, 720 }, { 1920, 1080 }, { 2560, 1440 } };
 
-        private readonly Dictionary<string, int> _androidToSdkVersion = new() { { "11", 30 }, { "10", 29 }, { "9", 28 }, { "8.1.0", 27 }, { "8.0.0", 26 }, { "7.1", 25 }, { "7.0", 24 } };
+        private readonly Dictionary<string, int> _androidToSdkVersion = new Dictionary<string, int>() { { "11", 30 }, { "10", 29 }, { "9", 28 }, { "8.1.0", 27 }, { "8.0.0", 26 }, { "7.1", 25 }, { "7.0", 24 } };
 
         private string _deviceName;
         private AndroidModel _deviceModel;
@@ -56,7 +56,7 @@ namespace WingandPrayer.MazdaApi.SensorData
 
         private void Randomize()
         {
-            Random rnd = new();
+            Random rnd = new Random();
             _deviceName = AndroidModels.Models.Keys.ToList()[rnd.Next(0, AndroidModels.Models.Count - 1)];
             _deviceModel = AndroidModels.Models[_deviceName];
             _deviceBuild = _deviceModel.Builds[rnd.Next(0, _deviceModel.Builds.Count - 1)];
@@ -86,7 +86,7 @@ namespace WingandPrayer.MazdaApi.SensorData
                 "0", "0", PercentEncode("REL"), PercentEncode(_buildVersionIncremental.ToString()), _androidToSdkVersion[_deviceBuild.Version].ToString(), PercentEncode("Google"),
                 PercentEncode(_deviceModel.Codename), PercentEncode("release-keys"), PercentEncode("user"), PercentEncode("android-build"),
                 PercentEncode(_deviceBuild.BuildId), PercentEncode(_deviceModel.Codename), PercentEncode("google"), PercentEncode(_deviceModel.Codename),
-                PercentEncode($"google/{_deviceModel.Codename}/{_deviceModel.Codename}:{_deviceBuild.Version}/{_deviceBuild.BuildId}/{_buildVersionIncremental.ToString()}:user/release-keys"),
+                PercentEncode($"google/{_deviceModel.Codename}/{_deviceModel.Codename}:{_deviceBuild.Version}/{_deviceBuild.BuildId}/{_buildVersionIncremental}:user/release-keys"),
                 PercentEncode(_buildHost), PercentEncode(_deviceBuild.BuildId)
             });
         }
@@ -95,11 +95,11 @@ namespace WingandPrayer.MazdaApi.SensorData
 
         private static string PercentEncode(string str)
         {
-            StringBuilder sb = new();
+            StringBuilder sb = new StringBuilder();
 
             foreach (byte b in Encoding.UTF8.GetBytes(str))
             {
-                sb.Append(b is >= 33 and <= 0x7E && b != 34 && b != 37 & b != 39 && b != 44 && b != 92 ? (char)b : $"%{b:X2}");
+                sb.Append(b >= 33 && b <= 0x7E && b != 34 && b != 37 & b != 39 && b != 44 && b != 92 ? ((char)b).ToString() : $"%{b:X2}");
             }
 
             return sb.ToString();

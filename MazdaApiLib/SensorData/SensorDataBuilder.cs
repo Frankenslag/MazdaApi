@@ -59,12 +59,12 @@ namespace WingandPrayer.MazdaApi.SensorData
 
         public string GenerateSensorData()
         {
-            Random rnd = new();
+            Random rnd = new Random();
             _touchEvents.Randomize(_sensorCollectionStartTimestamp);
             _keyEvents.Randomize(_sensorCollectionStartTimestamp);
             _backgroundEvents.Randomize(_sensorCollectionStartTimestamp);
 
-            StringBuilder sensorData = new();
+            StringBuilder sensorData = new StringBuilder();
 
             string orientationEvent = GenerateOrientationDataAa();
             string motionEvent = GenerateMotionDataAa();

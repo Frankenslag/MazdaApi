@@ -56,35 +56,50 @@ namespace WingandPrayer.MazdaApi.SensorData
 
         public void Randomize(DateTime sensorCollectionStartTimestamp)
         {
-            Random rnd = new();
+            Random rnd = new Random();
             _touchEvents.Clear();
 
             long msSinceSensorCollectionStarted = (long)(DateTime.UtcNow - sensorCollectionStartTimestamp).TotalMilliseconds;
 
-            switch (msSinceSensorCollectionStarted)
+            if (msSinceSensorCollectionStarted >= 3000 && msSinceSensorCollectionStarted < 5000)
             {
-                case >= 3000 and < 5000:
+                // down event
+                _touchEvents.Add(new TouchEvent(2, msSinceSensorCollectionStarted - rnd.Next(1000, 2000), 1, 1));
+
+                // move events
+                for (int i = 0; i < rnd.Next(2, 9); i++)
+                {
+                    _touchEvents.Add(new TouchEvent(1, rnd.Next(3, 50), 1, 1));
+                }
+
+                // up event
+                _touchEvents.Add(new TouchEvent(3, rnd.Next(3, 100), 1, 1));
+            }
+            else if (msSinceSensorCollectionStarted >= 5000 && msSinceSensorCollectionStarted < 10000)
+            {
+                for (int i = 0; i < 2; i++)
                 {
                     // down event
-                    _touchEvents.Add(new TouchEvent(2, msSinceSensorCollectionStarted - rnd.Next(1000, 2000), 1, 1));
-
-                    // move events
-                    for (int i = 0; i < rnd.Next(2, 9); i++)
-                    {
-                        _touchEvents.Add(new TouchEvent(1, rnd.Next(3, 50), 1, 1));
-                    }
-
-                    // up event
-                    _touchEvents.Add(new TouchEvent(3, rnd.Next(3, 100), 1, 1));
-                    break;
+                    _touchEvents.Add(new TouchEvent(2, rnd.Next(100, 1000) + (i == 0 ? 0 : 5000), 1, 1));
                 }
-                case >= 5000 and < 10000:
+
+                for (int i = 0; i < rnd.Next(2, 9); i++)
                 {
-                    for (int i = 0; i < 2; i++)
-                    {
-                        // down event
-                        _touchEvents.Add(new TouchEvent(2, rnd.Next(100, 1000) + (i == 0 ? 0 : 5000), 1, 1));
-                    }
+                    // move events
+                    _touchEvents.Add(new TouchEvent(1, rnd.Next(3, 50), 1, 1));
+                }
+
+                // up event
+                _touchEvents.Add(new TouchEvent(3, rnd.Next(3, 100), 1, 1));
+            }
+            else if (msSinceSensorCollectionStarted >= 10000)
+            {
+                for (int j = 0; j < 3; j++)
+                {
+                    long tso = j == 0 ? msSinceSensorCollectionStarted - 9000 : rnd.Next(2000, 3000);
+
+                    // down event
+                    _touchEvents.Add(new TouchEvent(2, rnd.Next(100, 1000) + tso, 1, 1));
 
                     for (int i = 0; i < rnd.Next(2, 9); i++)
                     {
@@ -94,28 +109,6 @@ namespace WingandPrayer.MazdaApi.SensorData
 
                     // up event
                     _touchEvents.Add(new TouchEvent(3, rnd.Next(3, 100), 1, 1));
-                    break;
-                }
-                case >= 10000:
-                {
-                    for (int j = 0; j < 3; j++)
-                    {
-                        long tso = j == 0 ? msSinceSensorCollectionStarted - 9000 : rnd.Next(2000, 3000);
-
-                        // down event
-                        _touchEvents.Add(new TouchEvent(2, rnd.Next(100, 1000) + tso, 1, 1));
-
-                        for (int i = 0; i < rnd.Next(2, 9); i++)
-                        {
-                            // move events
-                            _touchEvents.Add(new TouchEvent(1, rnd.Next(3, 50), 1, 1));
-                        }
-
-                        // up event
-                        _touchEvents.Add(new TouchEvent(3, rnd.Next(3, 100), 1, 1));
-                    }
-
-                    break;
                 }
             }
         }

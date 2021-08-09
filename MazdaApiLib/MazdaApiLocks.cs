@@ -46,10 +46,10 @@ namespace WingandPrayer.MazdaApi
         {
             get
             {
-                if (ApiLockState is not null || RequestedLockState is not null)
+                if (ApiLockState != null || RequestedLockState != null)
                 {
                     // only have the requested lock state
-                    if (ApiLockState is not null && RequestedLockState is null) return ApiLockState;
+                    if (ApiLockState != null && RequestedLockState is null) return ApiLockState;
 
                     // only have the api lock state
                     if (ApiLockState is null) return RequestedLockState;
@@ -65,7 +65,7 @@ namespace WingandPrayer.MazdaApi
 
     public partial class MazdaApiClient
     {
-        private readonly Dictionary<string, CachedLockState> _lockStates = new();
+        private readonly Dictionary<string, CachedLockState> _lockStates = new Dictionary<string, CachedLockState>();
 
         private CachedLockState GetCachedLockState(string internalVin)
         {

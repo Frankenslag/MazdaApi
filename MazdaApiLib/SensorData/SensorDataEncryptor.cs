@@ -29,8 +29,6 @@ using System.IO;
 using System.Linq;
 using System.Security.Cryptography;
 
-using WingandPrayer.MazdaApi.Crypto;
-
 namespace WingandPrayer.MazdaApi.SensorData
 {
     internal class SensorDataEncryptor
@@ -45,7 +43,7 @@ namespace WingandPrayer.MazdaApi.SensorData
 
         public SensorDataEncryptor()
         {
-            Random rnd = new();
+            Random rnd = new Random();
             _aesKey = new byte[16];
             _aesIv = new byte[16];
             _hmacSha256Key = new byte[32];
@@ -61,7 +59,7 @@ namespace WingandPrayer.MazdaApi.SensorData
 
         public string EncryptSensorData(string sensorData)
         {
-            Random rnd = new();
+            Random rnd = new Random();
 
             byte[] encrIvAndSensorData;
             byte[] encrIvAndSensorDataAndHmac;
@@ -77,9 +75,9 @@ namespace WingandPrayer.MazdaApi.SensorData
                 aes.Mode = CipherMode.CBC;
 
                 // Create the streams used for encryption.
-                using MemoryStream msEncrypt = new();
-                using CryptoStream csEncrypt = new(msEncrypt, encryptor, CryptoStreamMode.Write);
-                using (StreamWriter swEncrypt = new(csEncrypt))
+                using MemoryStream msEncrypt = new MemoryStream();
+                using CryptoStream csEncrypt = new CryptoStream(msEncrypt, encryptor, CryptoStreamMode.Write);
+                using (StreamWriter swEncrypt = new StreamWriter(csEncrypt))
                 {
                     //Write all data to the stream.
                     swEncrypt.Write(sensorData);
@@ -87,7 +85,7 @@ namespace WingandPrayer.MazdaApi.SensorData
                 encrIvAndSensorData = _aesIv.Concat(msEncrypt.ToArray()).ToArray();
             }
 
-            using (HMACSHA256 hmac = new(_hmacSha256Key))
+            using (HMACSHA256 hmac = new HMACSHA256(_hmacSha256Key))
             {
                 encrIvAndSensorDataAndHmac = encrIvAndSensorData.Concat(hmac.ComputeHash(encrIvAndSensorData)).ToArray();
             }

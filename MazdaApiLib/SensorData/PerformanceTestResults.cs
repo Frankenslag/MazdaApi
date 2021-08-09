@@ -42,7 +42,7 @@ namespace WingandPrayer.MazdaApi.SensorData
 
         private void Randomize()
         {
-            Random rnd = new();
+            Random rnd = new Random();
 
             _testResults.Add(16);
             _testResults.Add((rnd.Next(350, 600) * 100 - 1) / 100);

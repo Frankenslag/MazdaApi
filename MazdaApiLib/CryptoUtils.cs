@@ -30,7 +30,7 @@ using System.Globalization;
 using System.Security.Cryptography;
 using System.Text;
 
-namespace WingandPrayer.MazdaApi.Crypto
+namespace WingandPrayer.MazdaApi
 {
     public class CryptoUtils
     {
@@ -92,7 +92,7 @@ namespace WingandPrayer.MazdaApi.Crypto
                 return span.ToArray();
             }
 
-            AsnReader topLevelReader = new(data, AsnEncodingRules.DER);
+            AsnReader topLevelReader = new AsnReader(data, AsnEncodingRules.DER);
             AsnReader spkiReader = topLevelReader.ReadSequence();
             topLevelReader.ThrowIfNotEmpty();
 
@@ -106,11 +106,11 @@ namespace WingandPrayer.MazdaApi.Crypto
             algorithmReader.ReadNull();
             algorithmReader.ThrowIfNotEmpty();
 
-            AsnReader bitStringReader = new(spkiReader.ReadBitString(out _), AsnEncodingRules.DER);
+            AsnReader bitStringReader = new AsnReader(spkiReader.ReadBitString(out _), AsnEncodingRules.DER);
 
             AsnReader publicKeyReader = bitStringReader.ReadSequence();
 
-            RSAParameters rsaParameters = new()
+            RSAParameters rsaParameters = new RSAParameters()
             {
                 Modulus = ReadNormalizedInteger(publicKeyReader),
                 Exponent = ReadNormalizedInteger(publicKeyReader)

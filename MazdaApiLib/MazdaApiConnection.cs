@@ -30,7 +30,6 @@ using System.Collections.Specialized;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
-using System.Net.Http.Json;
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
@@ -39,7 +38,6 @@ using System.Threading.Tasks;
 using System.Web;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
-using WingandPrayer.MazdaApi.Crypto;
 using WingandPrayer.MazdaApi.Exceptions;
 using WingandPrayer.MazdaApi.SensorData;
 using JsonSerializer = System.Text.Json.JsonSerializer;
@@ -63,7 +61,7 @@ namespace WingandPrayer.MazdaApi
         private const string UserAgentUsherApi = "MyMazda/7.3.0 (Google Pixel 3a; Android 11)";
         private const int MaxRetries = 4;
 
-        private static readonly Dictionary<string, RegionConfig> RegionsConfigs = new()
+        private static readonly Dictionary<string, RegionConfig> RegionsConfigs = new Dictionary<string, RegionConfig>()
         {
             { "MNAO", new RegionConfig { ApplicationCode = "202007270941270111799", BaseUrl = new Uri("https://0cxo7m58.mazda.com/prod"), UsherUrl = new Uri("https://ptznwbh8.mazda.com/appapi/v1") } },
             { "MME", new RegionConfig { ApplicationCode = "202008100250281064816", BaseUrl = new Uri("https://e9stj7g7.mazda.com/prod"), UsherUrl = new Uri("https://rz97suam.mazda.com/appapi/v1") } },
@@ -144,9 +142,9 @@ namespace WingandPrayer.MazdaApi
                 aes.Mode = CipherMode.CBC;
 
                 // Create the streams used for encryption.
-                using MemoryStream msDecrypt = new(Convert.FromBase64String(payload));
-                using CryptoStream csDecrypt = new(msDecrypt, decryptor, CryptoStreamMode.Read);
-                using StreamReader sRDecrypt = new(csDecrypt);
+                using MemoryStream msDecrypt = new MemoryStream(Convert.FromBase64String(payload));
+                using CryptoStream csDecrypt = new CryptoStream(msDecrypt, decryptor, CryptoStreamMode.Read);
+                using StreamReader sRDecrypt = new StreamReader(csDecrypt);
                 return sRDecrypt.ReadToEnd();
             }
 
@@ -159,7 +157,7 @@ namespace WingandPrayer.MazdaApi
 
             if (!string.IsNullOrWhiteSpace(payload))
             {
-                using AesManaged aes = new()
+                using AesManaged aes = new AesManaged()
                 {
                     Mode = CipherMode.CBC,
                     Padding = PaddingMode.PKCS7,
@@ -172,8 +170,8 @@ namespace WingandPrayer.MazdaApi
                 ICryptoTransform encryptor = aes.CreateEncryptor(aes.Key, aes.IV);
 
                 // Create the streams used for encryption.
-                using MemoryStream msEncrypt = new();
-                using CryptoStream csEncrypt = new(msEncrypt, encryptor, CryptoStreamMode.Write);
+                using MemoryStream msEncrypt = new MemoryStream();
+                using CryptoStream csEncrypt = new CryptoStream(msEncrypt, encryptor, CryptoStreamMode.Write);
 
                 byte[] plainText = Encoding.UTF8.GetBytes(payload);
 
@@ -273,10 +271,10 @@ namespace WingandPrayer.MazdaApi
 
             if (!string.IsNullOrWhiteSpace(body)) encryptedBody = EncryptPayloadUsingKey(body);
 
-            using HttpClient httpClient = new();
+            using HttpClient httpClient = new HttpClient();
 
             httpClient.DefaultRequestHeaders.Clear();
-            using (HttpRequestMessage request = new() { RequestUri = new Uri(_regionConfig.BaseUrl + uri), Method = method, Content = new StringContent(encryptedBody) })
+            using (HttpRequestMessage request = new HttpRequestMessage() { RequestUri = new Uri(_regionConfig.BaseUrl + uri), Method = method, Content = new StringContent(encryptedBody) })
             {
                 request.Headers.Add("device-id", _baseApiDeviceId);
                 request.Headers.Add("app-code", _regionConfig.ApplicationCode);
@@ -297,7 +295,7 @@ namespace WingandPrayer.MazdaApi
 
                 HttpResponseMessage apiResponseMessage = await httpClient.SendAsync(request);
 
-                apiResponse = await apiResponseMessage.Content.ReadFromJsonAsync<ApiResponse>(new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+                apiResponse = JsonSerializer.Deserialize(await apiResponseMessage.Content.ReadAsByteArrayAsync(), typeof(ApiResponse), new JsonSerializerOptions { PropertyNameCaseInsensitive = true }) as ApiResponse;
             }
 
             if (apiResponse?.State == "S")
@@ -343,9 +341,9 @@ namespace WingandPrayer.MazdaApi
 
         private async Task LoginAsync()
         {
-            using HttpClient httpClient = new();
+            using HttpClient httpClient = new HttpClient();
             httpClient.DefaultRequestHeaders.Add("User-Agent", UserAgentUsherApi);
-            UriBuilder builder = new(_regionConfig.UsherUrl);
+            UriBuilder builder = new UriBuilder(_regionConfig.UsherUrl);
             builder.Path += @"/system/encryptionKey";
             NameValueCollection query = HttpUtility.ParseQueryString(builder.Query);
             query["appId"] = "MazdaApp";
@@ -354,7 +352,7 @@ namespace WingandPrayer.MazdaApi
             query["sdkVersion"] = UsherSdkVersion;
             builder.Query = query.ToString()!;
             HttpResponseMessage response = await httpClient.GetAsync(builder.ToString());
-            EncryptionKeyResponse encryptionKey = await response.Content.ReadFromJsonAsync<EncryptionKeyResponse>(new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+            EncryptionKeyResponse encryptionKey = JsonSerializer.Deserialize(await response.Content.ReadAsByteArrayAsync(), typeof(EncryptionKeyResponse), new JsonSerializerOptions { PropertyNameCaseInsensitive = true }) as EncryptionKeyResponse;
 
             _logger.LogDebug($"Logging in as {_emailAddress}");
             _logger.LogDebug("Retrieving public key to encrypt password");
@@ -363,7 +361,7 @@ namespace WingandPrayer.MazdaApi
             {
                 builder = new UriBuilder(_regionConfig.UsherUrl);
                 builder.Path += @"/user/login";
-                using (StringContent content = new(JsonSerializer.Serialize(new LoginRequest
+                using StringContent content = new StringContent(JsonSerializer.Serialize(new LoginRequest
                 {
                     AppId = "MazdaApp",
                     Locale = "en-US",
@@ -372,15 +370,13 @@ namespace WingandPrayer.MazdaApi
                     Password = $"{encryptionKey.Data.VersionPrefix}{Convert.ToBase64String(rsa.Encrypt(Encoding.UTF8.GetBytes($"{_usherApiPassword}:{DateTimeOffset.Now.ToUnixTimeSeconds()}"), RSAEncryptionPadding.Pkcs1))}",
                     UserId = _emailAddress,
                     UserIdType = "email"
-                }), Encoding.UTF8, "application/json"))
-                {
-                    response = await httpClient.PostAsync(builder.ToString(), content);
-                }
+                }), Encoding.UTF8, "application/json");
+                response = await httpClient.PostAsync(builder.ToString(), content);
             }
 
             _logger.LogDebug("Sending login request");
 
-            LoginResponse loginResponse = await response.Content.ReadFromJsonAsync<LoginResponse>(new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+            LoginResponse loginResponse = JsonSerializer.Deserialize(await response.Content.ReadAsByteArrayAsync(), typeof(LoginResponse), new JsonSerializerOptions { PropertyNameCaseInsensitive = true }) as LoginResponse;
 
             switch (loginResponse?.Status ?? string.Empty)
             {
@@ -406,67 +402,67 @@ namespace WingandPrayer.MazdaApi
 
         private class EncryptionKeyResponseData
         {
-            public string PublicKey { get; init; }
+            public string PublicKey { get; set; }
 
-            public string VersionPrefix { get; init; }
+            public string VersionPrefix { get; set; }
         }
 
         private class EncryptionKeyResponse
         {
-            public EncryptionKeyResponseData Data { get; init; }
+            public EncryptionKeyResponseData Data { get; set; }
         }
 
         private class LoginRequest
         {
-            [JsonPropertyName("appId")] public string AppId { get; init; }
+            [JsonPropertyName("appId")] public string AppId { get; set; }
 
-            [JsonPropertyName("deviceId")] public string DeviceId { get; init; }
+            [JsonPropertyName("deviceId")] public string DeviceId { get; set; }
 
-            [JsonPropertyName("locale")] public string Locale { get; init; }
+            [JsonPropertyName("locale")] public string Locale { get; set; }
 
-            [JsonPropertyName("password")] public string Password { get; init; }
+            [JsonPropertyName("password")] public string Password { get; set; }
 
-            [JsonPropertyName("sdkVersion")] public string SdkVersion { get; init; }
+            [JsonPropertyName("sdkVersion")] public string SdkVersion { get; set; }
 
-            [JsonPropertyName("userId")] public string UserId { get; init; }
+            [JsonPropertyName("userId")] public string UserId { get; set; }
 
-            [JsonPropertyName("userIdType")] public string UserIdType { get; init; }
+            [JsonPropertyName("userIdType")] public string UserIdType { get; set; }
         }
 
         private class LoginResponseData
         {
-            public string AccessToken { get; init; }
-            public long AccessTokenExpirationTs { get; init; }
+            public string AccessToken { get; set; }
+            public long AccessTokenExpirationTs { get; set; }
         }
 
 
         private class LoginResponse
         {
-            public string Status { get; init; }
-            public LoginResponseData Data { get; init; }
+            public string Status { get; set; }
+            public LoginResponseData Data { get; set; }
         }
 
         private class ApiResponse
         {
-            public string State { get; init; }
-            public string Error { get; init; }
-            public int ErrorCode { get; init; }
-            public string ExtraCode { get; init; }
-            public string Payload { get; init; }
+            public string State { get; set; }
+            public string Error { get; set; }
+            public int ErrorCode { get; set; }
+            public string ExtraCode { get; set; }
+            public string Payload { get; set; }
         }
 
         private class CheckVersionResponse
         {
-            public string EncKey { get; init; }
-            public string SignKey { get; init; }
+            public string EncKey { get; set; }
+            public string SignKey { get; set; }
         }
 
 
         private class RegionConfig
         {
-            public string ApplicationCode { get; init; }
-            public Uri BaseUrl { get; init; }
-            public Uri UsherUrl { get; init; }
+            public string ApplicationCode { get; set; }
+            public Uri BaseUrl { get; set; }
+            public Uri UsherUrl { get; set; }
         }
     }
 }

@@ -1,5 +1,5 @@
 ﻿// 
-// KeyEvents.cs
+// BackgroundEvents.cs
 // 
 // MIT License
 // 
@@ -30,68 +30,47 @@ using System.Linq;
 
 namespace WingandPrayer.MazdaApi.SensorData
 {
-    internal class KeyEvent
+    internal class BackgroundEvent
     {
+        public int EventType { get; }
         public long EventTime { get; }
-        public int CharCodeSum { get; }
-        public bool LongerThenBefore { get; }
 
-        public KeyEvent(long eventTime, int charCodeSum, bool longerThenBefore)
+        public BackgroundEvent(int eventType, long eventTime)
         {
+            EventType = eventType;
             EventTime = eventTime;
-            CharCodeSum = charCodeSum;
-            LongerThenBefore = longerThenBefore;
         }
 
-        public override string ToString() => $"2,{EventTime},{CharCodeSum}{(LongerThenBefore ? ",1" : string.Empty)};";
+        public override string ToString() => $"{EventType},{EventTime}";
     }
 
-    internal class KeyEvents
+    internal class BackgroundEvents
     {
-        private readonly List<KeyEvent> _keyEvents;
+        private readonly List<BackgroundEvent> _backgroundEvents;
 
-        public KeyEvents() => _keyEvents = new List<KeyEvent>();
+        public BackgroundEvents() => _backgroundEvents = new List<BackgroundEvent>();
 
         public void Randomize(DateTime sensorCollectionStartTimestamp)
         {
-            Random rnd = new();
-            _keyEvents.Clear();
+            Random rnd = new Random();
+            _backgroundEvents.Clear();
 
-            if (rnd.Next(0, 20) == 0)
+            if (rnd.Next(0, 10) == 0)
             {
-                double msSinceSensorCollectionStarted = (DateTime.UtcNow - sensorCollectionStartTimestamp).TotalMilliseconds;
+                long msSinceSensorCollectionStarted = (long)(DateTime.UtcNow - sensorCollectionStartTimestamp).TotalMilliseconds;
 
                 if (msSinceSensorCollectionStarted >= 10000)
                 {
-                    int charCodeSum = rnd.Next(517, 519);
-
-                    for (int i = 0; i < rnd.Next(2, 5); i++)
-                    {
-                        _keyEvents.Add(new KeyEvent(i == 0 ? rnd.Next(5000, 8000) : rnd.Next(10, 50), charCodeSum, rnd.Next(0, 2) == 0));
-                    }
+                    long pausedTimestamp = new DateTimeOffset(sensorCollectionStartTimestamp).ToUnixTimeMilliseconds() + rnd.Next(800, 4500);
+                    _backgroundEvents.Add(new BackgroundEvent(2, pausedTimestamp));
+                    _backgroundEvents.Add(new BackgroundEvent(3, pausedTimestamp + rnd.Next(2000, 5000)));
                 }
             }
         }
 
-        public int Length => _keyEvents.Count;
-
-        public long GetSum()
-        {
-            long retval = 0;
-
-            foreach (KeyEvent touchEvent in _keyEvents)
-            {
-                retval += touchEvent.CharCodeSum;
-                retval += touchEvent.EventTime;
-                retval += 2;
-            }
-
-            return retval;
-        }
-
         public override string ToString()
         {
-            return _keyEvents.Select(e => e.ToString()).Aggregate(string.Empty, (first, second) => $"{first}{second}");
+            return _backgroundEvents.Select(e => e.ToString()).Aggregate(string.Empty, (first, second) => $"{first}{second}");
         }
 
     }
