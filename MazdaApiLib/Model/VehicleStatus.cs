@@ -25,9 +25,95 @@
 // 
 
 using System;
+using System.Collections.Generic;
+
+// ReSharper disable UnusedMember.Global
 
 namespace WingandPrayer.MazdaApi.Model
 {
+    public class ChargeInfo
+    {
+        public int SmaphRemDrvDistKm { get; set; }
+        public int SmaphSoc { get; set; }
+        public int CstmzStatBatHeatAutoSw { get; set; }
+        public int SmaphRemDrvDistMile { get; set; }
+        public int AcChargeStatus { get; set; }
+        public int ChargeStatusSub { get; set; }
+        public int ChargerConnectorFitting { get; set; }
+        public int MaxChargeMinuteAc { get; set; }
+        public int BatteryHeaterOn { get; set; }
+        public int DcChargeStatus { get; set; }
+        public int MaxChargeMinuteQbc { get; set; }
+        public int ChargeScheduleStatus { get; set; }
+        public DateTime LastUpdatedTimeForScheduledChargeTime { get; set; }
+    }
+
+    public class RemoteHvacInfo
+    {
+        public int Hvac { get; set; }
+        public int RearDefogger { get; set; }
+        public double InCarTeDc { get; set; }
+        public double InCarTeDf { get; set; }
+        public int FrontDefroster { get; set; }
+    }
+
+    public class VehicleInfo
+    {
+        public ChargeInfo ChargeInfo { get; set; }
+        public RemoteHvacInfo RemoteHvacInfo { get; set; }
+    }
+
+    public class PlusBInformation
+    {
+        public VehicleInfo VehicleInfo { get; set; }
+    }
+
+    public class IgInformation
+    {
+        public VehicleInfo VehicleInfo { get; set; }
+    }
+
+    public class DcmPositionAccuracy
+    {
+        public int Gradient { get; set; }
+        public int MinorAxisError { get; set; }
+        public int AcquisitionState { get; set; }
+        public int MajorAxisError { get; set; }
+    }
+
+    public class PositionInfo
+    {
+        public DateTime AcquisitionDatetime { get; set; }
+        public double Latitude { get; set; }
+        public double Longitude { get; set; }
+        public DcmPositionAccuracy DcmPositionAccuracy { get; set; }
+    }
+
+    public class EvVehicleStatus
+    {
+        public string NId { get; set; }
+        public DateTime InformationDatetime { get; set; }
+        public PlusBInformation PlusBInformation { get; set; }
+        public int NotificationCategory { get; set; }
+        public string SId { get; set; }
+        public DateTime OccurrenceTime { get; set; }
+        public string DcmNumber { get; set; }
+        public string BsId { get; set; }
+        public DateTime DcmDormantDatetime { get; set; }
+        public IgInformation IgInformation { get; set; }
+        public string OccurrenceDate { get; set; }
+        public PositionInfo PositionInfo { get; set; }
+        public int PositionInfoCategory { get; set; }
+        public string TransmissionFactor { get; set; }
+    }
+
+    public class EvVehicleStatusResponse
+    {
+        public List<EvVehicleStatus> ResultData { get; set; }
+        public string ResultCode { get; set; }
+        public string VisitNo { get; set; }
+    }
+
     public class TirePressure
     {
         public double FrontLeftTirePressurePsi { get; set; }

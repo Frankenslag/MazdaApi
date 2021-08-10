@@ -39,6 +39,10 @@ namespace WingandPrayer.MazdaApi
 
         public async Task<MazdaApiRawVehicleStatus> GetRawVehicleStatusAsync(string internalVin) => JsonConvert.DeserializeObject<MazdaApiRawVehicleStatus>(await _controller.GetVehicleStatusAsync(internalVin));
 
+        public EvVehicleStatus GetEvVehicleStatus(string internalVin) => GetEvVehicleStatusAsync(internalVin).GetAwaiter().GetResult();
+
+        public Task<EvVehicleStatus> GetEvVehicleStatusAsync(string internalVin) => _controller.GetEvVehicleStatusAsync(internalVin);
+
         public VehicleStatus GetVehicleStatus(string internalVin) => GetVehicleStatusAsync(internalVin).GetAwaiter().GetResult();
 
         public async Task<VehicleStatus> GetVehicleStatusAsync(string internalVin)
@@ -48,7 +52,7 @@ namespace WingandPrayer.MazdaApi
             AlertInfo alertInfo = rawStatus.AlertInfos[0];
             RemoteInfo remoteInfo = rawStatus.RemoteInfos[0];
 
-            VehicleStatus retval = new VehicleStatus()
+            VehicleStatus retval = new VehicleStatus
             {
                 LastUpdatedTimestamp = alertInfo.OccurrenceDate,
                 Latitude = remoteInfo.PositionInfo.Latitude * (remoteInfo.PositionInfo.LatitudeFlag == 1 ? -1 : 1),

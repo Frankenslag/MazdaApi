@@ -61,7 +61,7 @@ namespace WingandPrayer.MazdaApi
         private const string UserAgentUsherApi = "MyMazda/7.3.0 (Google Pixel 3a; Android 11)";
         private const int MaxRetries = 4;
 
-        private static readonly Dictionary<string, RegionConfig> RegionsConfigs = new Dictionary<string, RegionConfig>()
+        private static readonly Dictionary<string, RegionConfig> RegionsConfigs = new Dictionary<string, RegionConfig>
         {
             { "MNAO", new RegionConfig { ApplicationCode = "202007270941270111799", BaseUrl = new Uri("https://0cxo7m58.mazda.com/prod"), UsherUrl = new Uri("https://ptznwbh8.mazda.com/appapi/v1") } },
             { "MME", new RegionConfig { ApplicationCode = "202008100250281064816", BaseUrl = new Uri("https://e9stj7g7.mazda.com/prod"), UsherUrl = new Uri("https://rz97suam.mazda.com/appapi/v1") } },
@@ -157,7 +157,7 @@ namespace WingandPrayer.MazdaApi
 
             if (!string.IsNullOrWhiteSpace(payload))
             {
-                using AesManaged aes = new AesManaged()
+                using AesManaged aes = new AesManaged
                 {
                     Mode = CipherMode.CBC,
                     Padding = PaddingMode.PKCS7,
@@ -274,7 +274,7 @@ namespace WingandPrayer.MazdaApi
             using HttpClient httpClient = new HttpClient();
 
             httpClient.DefaultRequestHeaders.Clear();
-            using (HttpRequestMessage request = new HttpRequestMessage() { RequestUri = new Uri(_regionConfig.BaseUrl + uri), Method = method, Content = new StringContent(encryptedBody) })
+            using (HttpRequestMessage request = new HttpRequestMessage { RequestUri = new Uri(_regionConfig.BaseUrl + uri), Method = method, Content = new StringContent(encryptedBody) })
             {
                 request.Headers.Add("device-id", _baseApiDeviceId);
                 request.Headers.Add("app-code", _regionConfig.ApplicationCode);

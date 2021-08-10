@@ -110,7 +110,7 @@ namespace WingandPrayer.MazdaApi
 
             AsnReader publicKeyReader = bitStringReader.ReadSequence();
 
-            RSAParameters rsaParameters = new RSAParameters()
+            RSAParameters rsaParameters = new RSAParameters
             {
                 Modulus = ReadNormalizedInteger(publicKeyReader),
                 Exponent = ReadNormalizedInteger(publicKeyReader)

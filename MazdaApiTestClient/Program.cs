@@ -120,6 +120,11 @@ namespace Wingandprayer.MazdaApi
                     {
                         client.GetAvailableService(vehicle.Id);
 
+                        if (vehicle.IsEvVehicle)
+                        {
+                            DumpObj(client.GetEvVehicleStatus(vehicle.Id));
+                        }
+
                         VehicleStatus vs = client.GetVehicleStatus(vehicle.Id);
                         DumpObj(vs);
 

@@ -35,7 +35,7 @@ namespace WingandPrayer.MazdaApi.SensorData
     {
         private readonly int[,] _screenSizes = {{ 1280, 720 }, { 1920, 1080 }, { 2560, 1440 } };
 
-        private readonly Dictionary<string, int> _androidToSdkVersion = new Dictionary<string, int>() { { "11", 30 }, { "10", 29 }, { "9", 28 }, { "8.1.0", 27 }, { "8.0.0", 26 }, { "7.1", 25 }, { "7.0", 24 } };
+        private readonly Dictionary<string, int> _androidToSdkVersion = new Dictionary<string, int> { { "11", 30 }, { "10", 29 }, { "9", 28 }, { "8.1.0", 27 }, { "8.0.0", 26 }, { "7.1", 25 }, { "7.0", 24 } };
 
         private string _deviceName;
         private AndroidModel _deviceModel;

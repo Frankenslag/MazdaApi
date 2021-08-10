@@ -66,6 +66,7 @@ namespace WingandPrayer.MazdaApi
                     {
                         Vin = baseInfo.Vin,
                         Id = baseInfo.Vehicle.CvInformation.InternalVin,
+                        IsEvVehicle = (baseInfo.VehicleType ?? string.Empty) == "1" && (baseInfo.EconnectType ?? string.Empty) == "1",
                         VinRegistStatus = vehicles.VehicleFlags[i].VinRegistStatus,
                         Nickname = await _controller.GetNicknameAsync(baseInfo.Vin),
                         CarlineCode = otherInformation.CarlineCode,

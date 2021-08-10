@@ -27,12 +27,14 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+using System.Linq;
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using WingandPrayer.MazdaApi.Exceptions;
+using WingandPrayer.MazdaApi.Model;
 
 namespace WingandPrayer.MazdaApi
 {
@@ -51,9 +53,21 @@ namespace WingandPrayer.MazdaApi
 
         public async Task<string> GetVehicleBaseInformationAsync() => await _connection.ApiRequestAsync(HttpMethod.Post, "/remoteServices/getVecBaseInfos/v4", new Dictionary<string, string> { { "internaluserid", "__INTERNAL_ID__" } }, true, true);
 
+        public async Task<EvVehicleStatus> GetEvVehicleStatusAsync(string internalVin)
+        {
+            EvVehicleStatusResponse result = JsonConvert.DeserializeObject<EvVehicleStatusResponse>(await _connection.ApiRequestAsync(HttpMethod.Post, "/remoteServices/getEVVehicleStatus/v4", $"{{\"internaluserid\": \"__INTERNAL_ID__\", \"internalvin\": {internalVin}, \"limit\": 1, \"offset\": 0, \"vecinfotype\": \"0\"}}", true, true));
+
+            if ((result?.ResultCode ?? string.Empty) == "200S00")
+            {
+                return result?.ResultData?.FirstOrDefault();
+            }
+
+            throw new MazdaApiException("Failed to get EV vehicle status");
+        }
+
         public async Task<string> GetVehicleStatusAsync(string internalVin)
         {
-            string json = await _connection.ApiRequestAsync(HttpMethod.Post, "/remoteServices/getVehicleStatus/v4", $"{{\"internaluserid\": \"__INTERNAL_ID__\", \"internalvin\": {internalVin}, \"limit\": 1, \"offset\": 0, \"vecinfotype\": \"0\" }}", true, true);
+            string json = await _connection.ApiRequestAsync(HttpMethod.Post, "/remoteServices/getVehicleStatus/v4", $"{{\"internaluserid\": \"__INTERNAL_ID__\", \"internalvin\": {internalVin}, \"limit\": 1, \"offset\": 0, \"vecinfotype\": \"0\"}}", true, true);
 
             if (CheckResult(json)) return json;
 
