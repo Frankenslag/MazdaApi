@@ -27,8 +27,6 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
-using System.IO;
-using System.Linq;
 using System.Net.Http;
 using System.Security.Cryptography;
 using System.Text;
@@ -101,17 +99,6 @@ namespace WingandPrayer.MazdaApi
             }
         }
 
-        private static string HexDigest(IEnumerable<byte> ary)
-        {
-            return ary.Aggregate("", (current, next) => $"{current}{next:X2}");
-        }
-
-        private static string GetPayloadSign(string payload, string signKey)
-        {
-            using SHA256 encoder256 = SHA256.Create();
-            return HexDigest(encoder256.ComputeHash(Encoding.UTF8.GetBytes(payload + signKey))).ToUpper();
-        }
-
         private string GetSignFromTimestamp(long timestamp)
         {
             string strTimestamp = timestamp.ToString();
@@ -120,74 +107,17 @@ namespace WingandPrayer.MazdaApi
 
             using (MD5 md5 = MD5.Create())
             {
-                val2 = HexDigest(md5.ComputeHash(Encoding.UTF8.GetBytes(HexDigest(md5.ComputeHash(Encoding.UTF8.GetBytes(_regionConfig.ApplicationCode + AppPackageId))).ToUpper() + SignatureMd5))).ToLower();
+                val2 = CryptoUtils.HexDigest(md5.ComputeHash(Encoding.UTF8.GetBytes(CryptoUtils.HexDigest(md5.ComputeHash(Encoding.UTF8.GetBytes(_regionConfig.ApplicationCode + AppPackageId))).ToUpper() + SignatureMd5))).ToLower();
             }
 
-            return GetPayloadSign(strTimestampExtended, val2.Substring(20, 12) + val2[..10] + val2.Substring(4, 2));
-        }
-
-        private static string DecryptPayloadUsingKey(string payload, string key)
-        {
-            if (!string.IsNullOrWhiteSpace(key))
-            {
-                using Aes aes = Aes.Create();
-                aes.BlockSize = 128;
-                aes.Padding = PaddingMode.PKCS7;
-                aes.Key = Encoding.UTF8.GetBytes(key);
-                aes.IV = Encoding.UTF8.GetBytes(Iv);
-
-                // Create an decryptor to perform the stream transform.
-                ICryptoTransform decryptor = aes.CreateDecryptor(aes.Key, aes.IV);
-
-                aes.Mode = CipherMode.CBC;
-
-                // Create the streams used for encryption.
-                using MemoryStream msDecrypt = new MemoryStream(Convert.FromBase64String(payload));
-                using CryptoStream csDecrypt = new CryptoStream(msDecrypt, decryptor, CryptoStreamMode.Read);
-                using StreamReader sRDecrypt = new StreamReader(csDecrypt);
-                return sRDecrypt.ReadToEnd();
-            }
-
-            throw new MazdaApiException("Missing encryption key");
-        }
-
-        private string EncryptPayloadUsingKey(string payload)
-        {
-            string retval = string.Empty;
-
-            if (!string.IsNullOrWhiteSpace(payload))
-            {
-                using AesManaged aes = new AesManaged
-                {
-                    Mode = CipherMode.CBC,
-                    Padding = PaddingMode.PKCS7,
-                    BlockSize = 128,
-                    Key = Encoding.ASCII.GetBytes(_encKey),
-                    IV = Encoding.ASCII.GetBytes(Iv)
-                };
-
-                // Create an encryptor to perform the stream transform.
-                ICryptoTransform encryptor = aes.CreateEncryptor(aes.Key, aes.IV);
-
-                // Create the streams used for encryption.
-                using MemoryStream msEncrypt = new MemoryStream();
-                using CryptoStream csEncrypt = new CryptoStream(msEncrypt, encryptor, CryptoStreamMode.Write);
-
-                byte[] plainText = Encoding.UTF8.GetBytes(payload);
-
-                byte[] buffer = encryptor.TransformFinalBlock(plainText, 0, plainText.Length);
-
-                return Convert.ToBase64String(buffer);
-            }
-
-            return retval;
+            return CryptoUtils.GetPayloadSign(strTimestampExtended, val2.Substring(20, 12) + val2[..10] + val2.Substring(4, 2));
         }
 
         private string GetSignFromPayloadAndTimestamp(string payload, long timestamp)
         {
             string strTimestamp = timestamp.ToString();
 
-            if (!string.IsNullOrWhiteSpace(payload)) return GetPayloadSign(EncryptPayloadUsingKey(payload) + strTimestamp + strTimestamp[6..] + strTimestamp[3..], _signKey);
+            if (!string.IsNullOrWhiteSpace(payload)) return CryptoUtils.GetPayloadSign(CryptoUtils.EncryptPayloadUsingKey(payload, _encKey, Iv) + strTimestamp + strTimestamp[6..] + strTimestamp[3..], _signKey);
 
             throw new MazdaApiException("Missing sign key");
         }
@@ -269,7 +199,7 @@ namespace WingandPrayer.MazdaApi
             ApiResponse apiResponse;
             string encryptedBody = string.Empty;
 
-            if (!string.IsNullOrWhiteSpace(body)) encryptedBody = EncryptPayloadUsingKey(body);
+            if (!string.IsNullOrWhiteSpace(body)) encryptedBody = CryptoUtils.EncryptPayloadUsingKey(body, _encKey, Iv);
 
             using HttpClient httpClient = new HttpClient();
 
@@ -305,14 +235,14 @@ namespace WingandPrayer.MazdaApi
                 if (uri.Contains("checkVersion"))
                 {
                     using MD5 md5 = MD5.Create();
-                    key = HexDigest(md5.ComputeHash(Encoding.UTF8.GetBytes(HexDigest(md5.ComputeHash(Encoding.UTF8.GetBytes(_regionConfig.ApplicationCode + AppPackageId))).ToUpper() + SignatureMd5))).ToLower().Substring(4, 16);
+                    key = CryptoUtils.HexDigest(md5.ComputeHash(Encoding.UTF8.GetBytes(CryptoUtils.HexDigest(md5.ComputeHash(Encoding.UTF8.GetBytes(_regionConfig.ApplicationCode + AppPackageId))).ToUpper() + SignatureMd5))).ToLower().Substring(4, 16);
                 }
                 else
                 {
                     key = _encKey;
                 }
 
-                string payload = DecryptPayloadUsingKey(apiResponse.Payload, key);
+                string payload = CryptoUtils.DecryptPayloadUsingKey(apiResponse.Payload, key, Iv);
 
                 _logger.LogTrace($"Payload received: {payload}");
 

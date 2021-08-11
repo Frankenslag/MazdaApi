@@ -26,6 +26,8 @@
 
 using System.Threading.Tasks;
 
+// ReSharper disable UnusedMember.Global
+
 namespace WingandPrayer.MazdaApi
 {
     public partial class MazdaApiClient

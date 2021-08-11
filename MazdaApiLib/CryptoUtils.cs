@@ -25,10 +25,14 @@
 // 
 
 using System;
+using System.Collections.Generic;
 using System.Formats.Asn1;
 using System.Globalization;
+using System.IO;
+using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
+using WingandPrayer.MazdaApi.Exceptions;
 
 namespace WingandPrayer.MazdaApi
 {
@@ -121,6 +125,71 @@ namespace WingandPrayer.MazdaApi
             RSA rsa = RSA.Create();
             rsa.ImportParameters(rsaParameters);
             return rsa;
+        }
+
+        public static string EncryptPayloadUsingKey(string payload, string key, string iv)
+        {
+            string retval = string.Empty;
+
+            if (!string.IsNullOrWhiteSpace(payload))
+            {
+                using AesManaged aes = new AesManaged
+                {
+                    Mode = CipherMode.CBC,
+                    Padding = PaddingMode.PKCS7,
+                    BlockSize = 128,
+                    Key = Encoding.ASCII.GetBytes(key),
+                    IV = Encoding.ASCII.GetBytes(iv)
+                };
+
+                // Create an encryptor to perform the stream transform.
+                ICryptoTransform encryptor = aes.CreateEncryptor(aes.Key, aes.IV);
+
+                // Create the streams used for encryption.
+                using MemoryStream msEncrypt = new MemoryStream();
+                using CryptoStream csEncrypt = new CryptoStream(msEncrypt, encryptor, CryptoStreamMode.Write);
+
+                byte[] plainText = Encoding.UTF8.GetBytes(payload);
+
+                byte[] buffer = encryptor.TransformFinalBlock(plainText, 0, plainText.Length);
+
+                return Convert.ToBase64String(buffer);
+            }
+
+            return retval;
+        }
+
+        public static string DecryptPayloadUsingKey(string payload, string key, string iv)
+        {
+            if (!string.IsNullOrWhiteSpace(key))
+            {
+                using Aes aes = Aes.Create();
+                aes.BlockSize = 128;
+                aes.Padding = PaddingMode.PKCS7;
+                aes.Key = Encoding.UTF8.GetBytes(key);
+                aes.IV = Encoding.UTF8.GetBytes(iv);
+
+                // Create an decryptor to perform the stream transform.
+                ICryptoTransform decryptor = aes.CreateDecryptor(aes.Key, aes.IV);
+
+                aes.Mode = CipherMode.CBC;
+
+                // Create the streams used for encryption.
+                using MemoryStream msDecrypt = new MemoryStream(Convert.FromBase64String(payload));
+                using CryptoStream csDecrypt = new CryptoStream(msDecrypt, decryptor, CryptoStreamMode.Read);
+                using StreamReader sRDecrypt = new StreamReader(csDecrypt);
+                return sRDecrypt.ReadToEnd();
+            }
+
+            throw new MazdaApiException("Missing encryption key");
+        }
+
+        public static string HexDigest(IEnumerable<byte> ary) => ary.Aggregate("", (current, next) => $"{current}{next:X2}");
+
+        public static string GetPayloadSign(string payload, string signKey)
+        {
+            using SHA256 encoder256 = SHA256.Create();
+            return HexDigest(encoder256.ComputeHash(Encoding.UTF8.GetBytes(payload + signKey))).ToUpper();
         }
     }
 }
