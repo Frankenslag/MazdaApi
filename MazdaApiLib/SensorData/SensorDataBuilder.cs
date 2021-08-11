@@ -32,7 +32,7 @@ using System.Text;
 
 namespace WingandPrayer.MazdaApi.SensorData
 {
-    public class SensorDataBuilder
+    internal class SensorDataBuilder
     {
         private const string SdkVersion = "2.2.3";
 

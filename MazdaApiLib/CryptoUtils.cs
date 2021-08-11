@@ -32,7 +32,7 @@ using System.Text;
 
 namespace WingandPrayer.MazdaApi
 {
-    public class CryptoUtils
+    internal class CryptoUtils
     {
         public static string GenerateUuidFromSeed(string seed)
         {

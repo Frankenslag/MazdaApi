@@ -35,16 +35,48 @@ namespace WingandPrayer.MazdaApi
 {
     public partial class MazdaApiClient
     {
+        /// <summary>
+        /// Get the raw vehicle status information from the API
+        /// </summary>
+        /// <remarks>This information has fields that are not applicable to electric vehicles please see GetEvVehicleStatus</remarks>
+        /// <param name="internalVin">The internal vehicle identity number for the vehicle which can be found with calls to methods that return vehicles</param>
+        /// <returns>A MazdaApiRawVehicleStatus</returns>
         public MazdaApiRawVehicleStatus GetRawVehicleStatus(string internalVin) => GetRawVehicleStatusAsync(internalVin).GetAwaiter().GetResult();
 
+        /// <summary>
+        /// Get the raw vehicle status information from the API asynchrounously.
+        /// </summary>
+        /// <remarks>This information has fields that are not applicable to electric vehicles please see GetEvVehicleStatusAsync</remarks>
+        /// <param name="internalVin">The internal vehicle identity number for the vehicle which can be found with calls to methods that return vehicles</param>
+        /// <returns>A MazdaApiRawVehicleStatus</returns>
         public async Task<MazdaApiRawVehicleStatus> GetRawVehicleStatusAsync(string internalVin) => JsonConvert.DeserializeObject<MazdaApiRawVehicleStatus>(await _controller.GetVehicleStatusAsync(internalVin));
 
+        /// <summary>
+        /// Get the vehicle status information relating to an electric vehicle from the API
+        /// </summary>
+        /// <param name="internalVin">The internal vehicle identity number for the vehicle which can be found with calls to methods that return vehicles</param>
+        /// <returns>An EvVehicleStatus</returns>
         public EvVehicleStatus GetEvVehicleStatus(string internalVin) => GetEvVehicleStatusAsync(internalVin).GetAwaiter().GetResult();
 
+        /// <summary>
+        /// Get the vehicle status information relating to an electric vehicle from the API asynchronously.
+        /// </summary>
+        /// <param name="internalVin">The internal vehicle identity number for the vehicle which can be found with calls to methods that return vehicles</param>
+        /// <returns>An EvVehicleStatus</returns>
         public Task<EvVehicleStatus> GetEvVehicleStatusAsync(string internalVin) => _controller.GetEvVehicleStatusAsync(internalVin);
 
+        /// <summary>
+        /// Get the simplified vehicle status information from the API
+        /// </summary>
+        /// <param name="internalVin">The internal vehicle identity number for the vehicle which can be found with calls to methods that return vehicles</param>
+        /// <returns>A VehicleStatus</returns>
         public VehicleStatus GetVehicleStatus(string internalVin) => GetVehicleStatusAsync(internalVin).GetAwaiter().GetResult();
 
+        /// <summary>
+        /// Get the simplified vehicle status information from the API asynchronously.
+        /// </summary>
+        /// <param name="internalVin">The internal vehicle identity number for the vehicle which can be found with calls to methods that return vehicles</param>
+        /// <returns>A VehicleStatus</returns>
         public async Task<VehicleStatus> GetVehicleStatusAsync(string internalVin)
         {
             MazdaApiRawVehicleStatus rawStatus = await GetRawVehicleStatusAsync(internalVin);

@@ -1,0 +1,241 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>MazdaApiLib</name>
+    </assembly>
+    <members>
+        <member name="M:WingandPrayer.MazdaApi.CryptoUtils.CreateRsaFromDerData(System.Byte[])">
+             <summary>
+            
+              Extract the public key from the the data like in the format example below and create an RSA class.
+             
+                 0 30  159: SEQUENCE {
+                 3 30   13:   SEQUENCE {
+                 5 06    9:     OBJECT IDENTIFIER '1 2 840 113549 1 1 1'
+                16 05    0:     NULL
+                          :     }
+                18 03  141:   BIT STRING 0 unused bits, encapsulates {
+                22 30  137:       SEQUENCE {
+                25 02  129:         INTEGER
+                          :           00 EB 11 E7 B4 46 2E 09 BB 3F 90 7E 25 98 BA 2F
+                          :           C4 F5 41 92 5D AB BF D8 FF 0B 8E 74 C3 F1 5E 14
+                          :           9E 7F B6 14 06 55 18 4D E4 2F 6D DB CD EA 14 2D
+                          :           8B F8 3D E9 5E 07 78 1F 98 98 83 24 E2 94 DC DB
+                          :           39 2F 82 89 01 45 07 8C 5C 03 79 BB 74 34 FF AC
+                          :           04 AD 15 29 E4 C0 4C BD 98 AF F4 B7 6D 3F F1 87
+                          :           2F B5 C6 D8 F8 46 47 55 ED F5 71 4E 7E 7A 2D BE
+                          :           2E 75 49 F0 BB 12 B8 57 96 F9 3D D3 8A 8F FF 97
+                          :           73
+               157 02    3:         INTEGER 65537
+                          :         }
+                          :       }
+                          :   }
+             </summary>
+             <param name="data"></param>
+             <returns></returns>
+        </member>
+        <member name="T:WingandPrayer.MazdaApi.Exceptions.MazdaApiAccountLockedException">
+            <summary>
+                Raised when account is locked from too many login attempts
+            </summary>
+        </member>
+        <member name="T:WingandPrayer.MazdaApi.Exceptions.MazdaApiAuthenticationException">
+            <summary>
+                Raised when email address or password are invalid during authentication
+            </summary>
+        </member>
+        <member name="T:WingandPrayer.MazdaApi.Exceptions.MazdaApiConfigException">
+            <summary>
+                Raised when Mazda API client is configured incorrectly
+            </summary>
+        </member>
+        <member name="T:WingandPrayer.MazdaApi.Exceptions.MazdaApiEncryptionException">
+            <summary>
+                Raised when server reports that the request is not encrypted properly
+            </summary>
+        </member>
+        <member name="T:WingandPrayer.MazdaApi.Exceptions.MazdaApiException">
+            <summary>
+                Raised when an unknown error occurs during API interaction
+            </summary>
+        </member>
+        <member name="T:WingandPrayer.MazdaApi.Exceptions.MazdaApiLoginFailedException">
+            <summary>
+                Raised when login fails for an unknown reason
+            </summary>
+        </member>
+        <member name="T:WingandPrayer.MazdaApi.Exceptions.MazdaApiRequestInProgressException">
+            <summary>
+                Raised when a request fails because another request is already in progress
+            </summary>
+        </member>
+        <member name="T:WingandPrayer.MazdaApi.Exceptions.MazdaApiTokenExpiredException">
+            <summary>
+                Raised when server reports that the access token has expired
+            </summary>
+        </member>
+        <member name="M:WingandPrayer.MazdaApi.MazdaApiClient.#ctor(System.String,System.String,System.String,System.Boolean,Microsoft.Extensions.Logging.ILogger{WingandPrayer.MazdaApi.MazdaApiClient})">
+            <summary>
+            Constructs an instance of the MazdaApiClient that is used to access all the public methods.
+            </summary>
+            <param name="emailAddress">The email address you use to log into the MyMazda mobile app</param>
+            <param name="password">The password you use to log into the MyMazda mobile app</param>
+            <param name="region">The code for the region in which your account was registered (MNAO - North America, MME - Europe, MJO - Japan)</param>
+            <param name="useCachedVehicleList">A flag that when set to true caches calls to methods that return vehicles. (Optional, defaults to false)</param>
+            <param name="logger">An ILogger that can be used for debugging and tracing purposes. (Optional, defaults to null)</param>
+        </member>
+        <member name="M:WingandPrayer.MazdaApi.MazdaApiClient.GetRemotePermissions(System.String)">
+            <summary>
+            Get the remote permissions for a given vehicle.
+            </summary>
+            <param name="vin">The vehicle identity number fo the vehicle</param>
+            <returns>A RemoteControlPermissions object containing the remote permissions</returns>
+        </member>
+        <member name="M:WingandPrayer.MazdaApi.MazdaApiClient.GetRemotePermissionsAsync(System.String)">
+            <summary>
+            Get the remote permissions for a given vehicle asynchronously.
+            </summary>
+            <param name="vin">The vehicle identity number fo the vehicle</param>
+            <returns>A RemoteControlPermissions object containing the remote permissions</returns>
+        </member>
+        <member name="M:WingandPrayer.MazdaApi.MazdaApiClient.GetAvailableService(System.String)">
+            <summary>
+            Get the available services for a given vehicle.
+            </summary>
+            <param name="internalVin">The internal vehicle identity number for the vehicle which can be found with calls to methods that return vehicles</param>
+            <returns>An AvailableService object containing the available services</returns>
+        </member>
+        <member name="M:WingandPrayer.MazdaApi.MazdaApiClient.GetAvailableServiceAsync(System.String)">
+            <summary>
+            Get the available services for a given vehicle asynchronously.
+            </summary>
+            <param name="internalVin">The internal vehicle identity number for the vehicle which can be found with calls to methods that return vehicles</param>
+            <returns>An AvailableService object containing the available services</returns>
+        </member>
+        <member name="M:WingandPrayer.MazdaApi.MazdaApiClient.TurnOnHazzardLights(System.String)">
+            <summary>
+            Turns on the vehicle hazard lights.
+            </summary>
+            <param name="internalVin">The internal vehicle identity number for the vehicle which can be found with calls to methods that return vehicles</param>
+        </member>
+        <member name="M:WingandPrayer.MazdaApi.MazdaApiClient.TurnOffHazzardLights(System.String)">
+            <summary>
+            Turns off the vehicle hazard lights.
+            </summary>
+            <param name="internalVin">The internal vehicle identity number for the vehicle which can be found with calls to methods that return vehicles</param>
+        </member>
+        <member name="M:WingandPrayer.MazdaApi.MazdaApiClient.TurnOnHazzardLightsAsync(System.String)">
+            <summary>
+            Turns on the vehicle hazard lights asynchronously.
+            </summary>
+            <param name="internalVin">The internal vehicle identity number for the vehicle which can be found with calls to methods that return vehicles</param>
+        </member>
+        <member name="M:WingandPrayer.MazdaApi.MazdaApiClient.TurnOffHazzardLightsAsync(System.String)">
+            <summary>
+            Turns off the vehicle hazard lights asynchronously.
+            </summary>
+            <param name="internalVin">The internal vehicle identity number for the vehicle which can be found with calls to methods that return vehicles</param>
+        </member>
+        <member name="M:WingandPrayer.MazdaApi.MazdaApiClient.GetAssumedLockState(System.String)">
+            <summary>
+            Get the assumed lock state of a vehicle.
+            </summary>
+            <remarks>This method derives the lock state from both the actual lock state that is read from the vehicle and the attempts by this to lock and unlock the vehicle by this api
+            It is required because there is often a delay between locking the vehical and the status changing with the api</remarks>
+            <param name="internalVin">The internal vehicle identity number for the vehicle which can be found with calls to methods that return vehicles</param>
+            <returns>A bool to indicate the assumed lock state or null if the lock state cannot be determined</returns>
+        </member>
+        <member name="M:WingandPrayer.MazdaApi.MazdaApiClient.LockDoor(System.String)">
+            <summary>
+            Locks the doors of the vehicle.
+            </summary>
+            <param name="internalVin">The internal vehicle identity number for the vehicle which can be found with calls to methods that return vehicles</param>
+        </member>
+        <member name="M:WingandPrayer.MazdaApi.MazdaApiClient.UnlockDoor(System.String)">
+            <summary>
+            Unlocks the doors of the vehicle.
+            </summary>
+            <param name="internalVin">The internal vehicle identity number for the vehicle which can be found with calls to methods that return vehicles</param>
+        </member>
+        <member name="M:WingandPrayer.MazdaApi.MazdaApiClient.LockDoorAsync(System.String)">
+            <summary>
+            Locks the doors of the vehicle asynchronously.
+            </summary>
+            <param name="internalVin">The internal vehicle identity number for the vehicle which can be found with calls to methods that return vehicles</param>
+        </member>
+        <member name="M:WingandPrayer.MazdaApi.MazdaApiClient.UnlockDoorAsync(System.String)">
+            <summary>
+            Unlocks the doors of the vehicle asynchronously.
+            </summary>
+            <param name="internalVin">The internal vehicle identity number for the vehicle which can be found with calls to methods that return vehicles</param>
+        </member>
+        <member name="M:WingandPrayer.MazdaApi.MazdaApiClient.GetRawVehicles">
+            <summary>
+            Get the raw vehicle(s) information from the API
+            </summary>
+            <returns>A MazdaApiVehicles describing the raw information for all api vehicles</returns>
+        </member>
+        <member name="M:WingandPrayer.MazdaApi.MazdaApiClient.GetRawVehiclesAsync">
+            <summary>
+            Get the raw vehicle(s) information from the API asynchronously.
+            </summary>
+            <returns>A MazdaApiVehicles describing the raw information for all api vehicles</returns>
+        </member>
+        <member name="M:WingandPrayer.MazdaApi.MazdaApiClient.GetVehicles">
+            <summary>
+            Get the list of vehicles from the API
+            </summary>
+            <returns>A list of VehicleModel describing the raw information for all api vehicles</returns>
+        </member>
+        <member name="M:WingandPrayer.MazdaApi.MazdaApiClient.GetVehiclesAsync">
+            <summary>
+            Get the list of vehicles from the API asynchronously.
+            </summary>
+            <returns>A list of VehicleModel describing the raw information for all api vehicles</returns>
+        </member>
+        <member name="M:WingandPrayer.MazdaApi.MazdaApiClient.GetRawVehicleStatus(System.String)">
+            <summary>
+            Get the raw vehicle status information from the API
+            </summary>
+            <remarks>This information has fields that are not applicable to electric vehicles please see GetEvVehicleStatus</remarks>
+            <param name="internalVin">The internal vehicle identity number for the vehicle which can be found with calls to methods that return vehicles</param>
+            <returns>A MazdaApiRawVehicleStatus</returns>
+        </member>
+        <member name="M:WingandPrayer.MazdaApi.MazdaApiClient.GetRawVehicleStatusAsync(System.String)">
+            <summary>
+            Get the raw vehicle status information from the API asynchrounously.
+            </summary>
+            <remarks>This information has fields that are not applicable to electric vehicles please see GetEvVehicleStatusAsync</remarks>
+            <param name="internalVin">The internal vehicle identity number for the vehicle which can be found with calls to methods that return vehicles</param>
+            <returns>A MazdaApiRawVehicleStatus</returns>
+        </member>
+        <member name="M:WingandPrayer.MazdaApi.MazdaApiClient.GetEvVehicleStatus(System.String)">
+            <summary>
+            Get the vehicle status information relating to an electric vehicle from the API
+            </summary>
+            <param name="internalVin">The internal vehicle identity number for the vehicle which can be found with calls to methods that return vehicles</param>
+            <returns>An EvVehicleStatus</returns>
+        </member>
+        <member name="M:WingandPrayer.MazdaApi.MazdaApiClient.GetEvVehicleStatusAsync(System.String)">
+            <summary>
+            Get the vehicle status information relating to an electric vehicle from the API asynchronously.
+            </summary>
+            <param name="internalVin">The internal vehicle identity number for the vehicle which can be found with calls to methods that return vehicles</param>
+            <returns>An EvVehicleStatus</returns>
+        </member>
+        <member name="M:WingandPrayer.MazdaApi.MazdaApiClient.GetVehicleStatus(System.String)">
+            <summary>
+            Get the simplified vehicle status information from the API
+            </summary>
+            <param name="internalVin">The internal vehicle identity number for the vehicle which can be found with calls to methods that return vehicles</param>
+            <returns>A VehicleStatus</returns>
+        </member>
+        <member name="M:WingandPrayer.MazdaApi.MazdaApiClient.GetVehicleStatusAsync(System.String)">
+            <summary>
+            Get the simplified vehicle status information from the API asynchronously.
+            </summary>
+            <param name="internalVin">The internal vehicle identity number for the vehicle which can be found with calls to methods that return vehicles</param>
+            <returns>A VehicleStatus</returns>
+        </member>
+    </members>
+</doc>

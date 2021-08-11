@@ -39,8 +39,16 @@ namespace WingandPrayer.MazdaApi
         private readonly bool _useCachedVehicleList;
         private MazdaApiVehicles _vehicleCache;
 
+        /// <summary>
+        /// Get the raw vehicle(s) information from the API
+        /// </summary>
+        /// <returns>A MazdaApiVehicles describing the raw information for all api vehicles</returns>
         public MazdaApiVehicles GetRawVehicles() => GetRawVehiclesAsync().GetAwaiter().GetResult();
 
+        /// <summary>
+        /// Get the raw vehicle(s) information from the API asynchronously.
+        /// </summary>
+        /// <returns>A MazdaApiVehicles describing the raw information for all api vehicles</returns>
         public async Task<MazdaApiVehicles> GetRawVehiclesAsync()
         {
             if (_vehicleCache == null || !_useCachedVehicleList) _vehicleCache = JsonConvert.DeserializeObject<MazdaApiVehicles>(await _controller.GetVehicleBaseInformationAsync());
@@ -48,8 +56,16 @@ namespace WingandPrayer.MazdaApi
             return _vehicleCache;
         }
 
+        /// <summary>
+        /// Get the list of vehicles from the API
+        /// </summary>
+        /// <returns>A list of VehicleModel describing the raw information for all api vehicles</returns>
         public List<VehicleModel> GetVehicles() => GetVehiclesAsync().GetAwaiter().GetResult();
 
+        /// <summary>
+        /// Get the list of vehicles from the API asynchronously.
+        /// </summary>
+        /// <returns>A list of VehicleModel describing the raw information for all api vehicles</returns>
         public async Task<List<VehicleModel>> GetVehiclesAsync()
         {
             List<VehicleModel> retval = new List<VehicleModel>();

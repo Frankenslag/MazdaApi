@@ -74,12 +74,31 @@ namespace WingandPrayer.MazdaApi
             return _lockStates[internalVin];
         }
 
+        /// <summary>
+        /// Get the assumed lock state of a vehicle.
+        /// </summary>
+        /// <remarks>This method derives the lock state from both the actual lock state that is read from the vehicle and the attempts by this to lock and unlock the vehicle by this api
+        /// It is required because there is often a delay between locking the vehical and the status changing with the api</remarks>
+        /// <param name="internalVin">The internal vehicle identity number for the vehicle which can be found with calls to methods that return vehicles</param>
+        /// <returns>A bool to indicate the assumed lock state or null if the lock state cannot be determined</returns>
         public bool? GetAssumedLockState(string internalVin) => GetCachedLockState(internalVin).AssumedLockState;
 
+        /// <summary>
+        /// Locks the doors of the vehicle.
+        /// </summary>
+        /// <param name="internalVin">The internal vehicle identity number for the vehicle which can be found with calls to methods that return vehicles</param>
         public void LockDoor(string internalVin) => LockDoorAsync(internalVin).Wait();
 
+        /// <summary>
+        /// Unlocks the doors of the vehicle.
+        /// </summary>
+        /// <param name="internalVin">The internal vehicle identity number for the vehicle which can be found with calls to methods that return vehicles</param>
         public void UnlockDoor(string internalVin) => UnlockDoorAsync(internalVin).Wait();
 
+        /// <summary>
+        /// Locks the doors of the vehicle asynchronously.
+        /// </summary>
+        /// <param name="internalVin">The internal vehicle identity number for the vehicle which can be found with calls to methods that return vehicles</param>
         public async Task LockDoorAsync(string internalVin)
         {
             CachedLockState lockState = GetCachedLockState(internalVin);
@@ -90,6 +109,10 @@ namespace WingandPrayer.MazdaApi
             await _controller.SetDoorLockAsync(internalVin, true);
         }
 
+        /// <summary>
+        /// Unlocks the doors of the vehicle asynchronously.
+        /// </summary>
+        /// <param name="internalVin">The internal vehicle identity number for the vehicle which can be found with calls to methods that return vehicles</param>
         public async Task UnlockDoorAsync(string internalVin)
         {
             CachedLockState lockState = GetCachedLockState(internalVin);
