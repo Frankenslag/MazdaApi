@@ -28,6 +28,7 @@ using System;
 using System.Collections;
 using System.ComponentModel;
 using System.Linq;
+using System.Net.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Configuration.Json;
 using Microsoft.Extensions.DependencyInjection;
@@ -70,6 +71,8 @@ namespace Wingandprayer.MazdaApi
 
         private static void Main(string[] args)
         {
+            using HttpClient httpClient = new();
+
             // create a service host. Done so that logging and user secrets are included as services.
             IHost serviceHost = Host.CreateDefaultBuilder().ConfigureServices((hostContext, services) =>
             {
@@ -86,7 +89,8 @@ namespace Wingandprayer.MazdaApi
                     {
                         if (secretProvider.TryGet("TestCredentials:Email", out string email) && secretProvider.TryGet("TestCredentials:Secret", out string secret) & secretProvider.TryGet("TestCredentials:Region", out string region))
                         {
-                            retval = new MazdaApiClient(email, secret, region, logger: s.GetRequiredService<ILogger<MazdaApiClient>>());
+                            // ReSharper disable once AccessToDisposedClosure
+                            retval = new MazdaApiClient(email, secret, region, httpClient, logger: s.GetRequiredService<ILogger<MazdaApiClient>>());
                         }
                         else
                         {

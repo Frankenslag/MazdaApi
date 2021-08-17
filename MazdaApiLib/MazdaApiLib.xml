@@ -74,13 +74,14 @@
                 Raised when server reports that the access token has expired
             </summary>
         </member>
-        <member name="M:WingandPrayer.MazdaApi.MazdaApiClient.#ctor(System.String,System.String,System.String,System.Boolean,Microsoft.Extensions.Logging.ILogger{WingandPrayer.MazdaApi.MazdaApiClient})">
+        <member name="M:WingandPrayer.MazdaApi.MazdaApiClient.#ctor(System.String,System.String,System.String,System.Net.Http.HttpClient,System.Boolean,Microsoft.Extensions.Logging.ILogger{WingandPrayer.MazdaApi.MazdaApiClient})">
             <summary>
             Constructs an instance of the MazdaApiClient that is used to access all the public methods.
             </summary>
             <param name="emailAddress">The email address you use to log into the MyMazda mobile app</param>
             <param name="password">The password you use to log into the MyMazda mobile app</param>
             <param name="region">The code for the region in which your account was registered (MNAO - North America, MME - Europe, MJO - Japan)</param>
+            <param name="httpClient">HttpClient used to communicate with MyMazda</param>
             <param name="useCachedVehicleList">A flag that when set to true caches calls to methods that return vehicles. (Optional, defaults to false)</param>
             <param name="logger">An ILogger that can be used for debugging and tracing purposes. (Optional, defaults to null)</param>
         </member>
