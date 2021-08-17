@@ -42,7 +42,7 @@ namespace WingandPrayer.MazdaApi
     {
         private readonly MazdaApiConnection _connection;
 
-        public MazdaApiController(string emailAddress, string password, string region, ILogger<MazdaApiClient> logger) => _connection = new MazdaApiConnection(emailAddress, password, region, logger);
+        public MazdaApiController(string emailAddress, string password, string region, HttpClient httpClient, ILogger<MazdaApiClient> logger) => _connection = new MazdaApiConnection(emailAddress, password, region, httpClient, logger);
 
         private static bool CheckResult(string json)
         {

@@ -5,52 +5,57 @@ Note: There is no official API, and this library may stop working at any time wi
 
 This library is a port of the **pymazda** library by **bdr99**.
 
-# Installation
-
-To install the latest release from [PyPI](https://pypi.org/project/pymazda/), run `pip3 install pymazda`.
 
 # Quick Start
 
-This example initializes the API client and gets a list of vehicles linked to the account. Then, for each vehicle, it gets and outputs the vehicle status and starts the engine.
+This example initializes the API client and gets a list of vehicles linked to the account. Then, for each vehicle, it gets the vehicle status.
 
-```python
-import asyncio
-import pymazda
+```C#
+using System.Net.Http;
+using WingandPrayer.MazdaApi;
+using WingandPrayer.MazdaApi.Model;
 
-async def test() -> None:
-    # Initialize API client (MNAO = North America)
-    client = pymazda.Client("myemail", "mypassword", "MNAO")
+namespace apitest
+{
+    class Program
+    {
+        static void Main(string[] args)
+        {
+            using HttpClient httpClient = new();
 
-    # Get list of vehicles from the API (returns a list)
-    vehicles = await client.get_vehicles()
+            // initialise the MazdaAPI client
+            MazdaApiClient mazdaApiClient = new("my email", "my password", "my region", httpClient);
 
-    # Loop through the registered vehicles
-    for vehicle in vehicles:
-        # Get vehicle ID (you will need this in order to perform any other actions with the vehicle)
-        vehicle_id = vehicle["id"]
+            // loop through the registered vehicles
+            foreach (VehicleModel vehicleModel in mazdaApiClient.GetVehicles())
+            {
+                // check that the vehicle is fully registered correctly.
+                if (vehicleModel.VinRegistStatus == 3)
+                {
+                    // get the vehicle status from the api
+                    VehicleStatus vehicleStatus = mazdaApiClient.GetVehicleStatus(vehicleModel.Id);
 
-        # Get and output vehicle status
-        status = await client.get_vehicle_status(vehicle_id)
-        print(status)
-
-        # Start engine
-        await client.start_engine(vehicle_id)
-    
-    # Close the session
-    await client.close()
-
-if __name__ == "__main__":
-    loop = asyncio.get_event_loop()
-    loop.run_until_complete(test())
+                    // see if the vehicle is an electric vehicle
+                    if (vehicleModel.IsEvVehicle)
+                    {
+                        EvVehicleStatus evVehicleStatus  = mazdaApiClient.GetEvVehicleStatus(vehicleModel.Id);
+                    }
+                }
+            }
+        }
+    }
+}
 ```
 
 You will need the email address and password that you use to sign into the MyMazda mobile app. Before using this library, you will need to link your vehicle to your MyMazda account using the app. You will also need the region code for your region. See below for a list of region codes.
 
 When calling these methods, it may take some time for the vehicle to respond accordingly. This is dependent on the quality of the car's connection to the mobile network. It is best to avoid making too many API calls in a short time period of time, as this may result in rate limiting.
 
+The sample code above shows using synchronous methods of the client but if required async methods are available.
+
 # API Documentation
 
-### #ctor(emailAddress,password,region,useCachedVehicleList,logger) `constructor`
+### MazdaApiClient(emailAddress,password,region,httpClient,useCachedVehicleList,logger) `constructor`
 
 ##### Summary
 
@@ -63,6 +68,7 @@ Constructs an instance of the MazdaApiClient that is used to access all the publ
 | emailAddress | [System.String](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.String 'System.String') | The email address you use to log into the MyMazda mobile app |
 | password | [System.String](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.String 'System.String') | The password you use to log into the MyMazda mobile app |
 | region | [System.String](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.String 'System.String') | The code for the region in which your account was registered (MNAO - North America, MME - Europe, MJO - Japan) |
+| httpClient | [System.Net.Http.HttpClient](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Net.Http.HttpClient 'System.Net.Http.HttpClient') | HttpClient used to communicate with MyMazda |
 | useCachedVehicleList | [System.Boolean](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Boolean 'System.Boolean') | A flag that when set to true caches calls to methods that return vehicles. (Optional, defaults to false) |
 | logger | [Microsoft.Extensions.Logging.ILogger{WingandPrayer.MazdaApi.MazdaApiClient}](#T-Microsoft-Extensions-Logging-ILogger{WingandPrayer-MazdaApi-MazdaApiClient} 'Microsoft.Extensions.Logging.ILogger{WingandPrayer.MazdaApi.MazdaApiClient}') | An ILogger that can be used for debugging and tracing purposes. (Optional, defaults to null) |
 

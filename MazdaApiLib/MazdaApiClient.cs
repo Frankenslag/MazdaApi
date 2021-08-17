@@ -24,6 +24,7 @@
 // SOFTWARE.
 // 
 
+using System.Net.Http;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
@@ -44,25 +45,40 @@ namespace WingandPrayer.MazdaApi
         /// <param name="emailAddress">The email address you use to log into the MyMazda mobile app</param>
         /// <param name="password">The password you use to log into the MyMazda mobile app</param>
         /// <param name="region">The code for the region in which your account was registered (MNAO - North America, MME - Europe, MJO - Japan)</param>
+        /// <param name="httpClient">HttpClient used to communicate with MyMazda</param>
         /// <param name="useCachedVehicleList">A flag that when set to true caches calls to methods that return vehicles. (Optional, defaults to false)</param>
         /// <param name="logger">An ILogger that can be used for debugging and tracing purposes. (Optional, defaults to null)</param>
-        public MazdaApiClient(string emailAddress, string password, string region, bool useCachedVehicleList = false, ILogger<MazdaApiClient> logger = null)
+        public MazdaApiClient(string emailAddress, string password, string region, HttpClient httpClient, bool useCachedVehicleList = false, ILogger<MazdaApiClient> logger = null)
         {
-            if (!string.IsNullOrWhiteSpace(emailAddress))
+            if (!(httpClient is null))
             {
-                if (!string.IsNullOrWhiteSpace(password))
+                if (!string.IsNullOrWhiteSpace(emailAddress))
                 {
-                    _controller = new MazdaApiController(emailAddress, password, region, logger);
-                    _useCachedVehicleList = useCachedVehicleList;
+                    if (!string.IsNullOrWhiteSpace(password))
+                    {
+                        if (!string.IsNullOrWhiteSpace(region))
+                        {
+                            _controller = new MazdaApiController(emailAddress, password, region, httpClient, logger);
+                            _useCachedVehicleList = useCachedVehicleList;
+                        }
+                        else
+                        {
+                            throw new MazdaApiConfigException("Invalid or missing region parameter");
+                        }
+                    }
+                    else
+                    {
+                        throw new MazdaApiConfigException("Invalid or missing password parameter");
+                    }
                 }
                 else
                 {
-                    throw new MazdaApiConfigException("Invalid or missing password");
+                    throw new MazdaApiConfigException("Invalid or missing email address parameter");
                 }
             }
             else
             {
-                throw new MazdaApiConfigException("Invalid or missing email address");
+                throw new MazdaApiConfigException("Invalid or missing httpClient parameter");
             }
         }
 

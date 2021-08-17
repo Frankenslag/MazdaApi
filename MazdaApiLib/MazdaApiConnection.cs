@@ -48,6 +48,7 @@ namespace WingandPrayer.MazdaApi
     internal class MazdaApiConnection
     {
         private readonly ILogger<MazdaApiClient> _logger;
+        private readonly HttpClient _httpClient;
 
         private const string AppOs = "Android";
         private const string Iv = "0102030405060708";
@@ -66,24 +67,26 @@ namespace WingandPrayer.MazdaApi
             { "MJO", new RegionConfig { ApplicationCode = "202009170613074283422", BaseUrl = new Uri("https://wcs9p6wj.mazda.com/prod"), UsherUrl = new Uri("https://c5ulfwxr.mazda.com/appapi/v1") } }
         };
 
-        private readonly string _baseApiDeviceId;
-        private readonly string _emailAddress;
 
         private readonly RegionConfig _regionConfig;
-        private readonly SensorDataBuilder _sensorDataBuilder;
-        private readonly string _usherApiDeviceId;
+        private readonly string _emailAddress;
         private readonly string _usherApiPassword;
+
+        private readonly SensorDataBuilder _sensorDataBuilder;
+        private readonly string _baseApiDeviceId;
+        private readonly string _usherApiDeviceId;
         private string _accessToken;
         private DateTime _accessTokenExpirationTs;
         private string _encKey;
         private string _signKey;
 
-        public MazdaApiConnection(string emailAddress, string password, string region, ILogger<MazdaApiClient> logger)
+        public MazdaApiConnection(string emailAddress, string password, string region, HttpClient httpClient, ILogger<MazdaApiClient> logger)
         {
             _logger = logger;
 
             if (RegionsConfigs.ContainsKey(region))
             {
+                _httpClient = httpClient;
                 _emailAddress = emailAddress;
                 _usherApiPassword = password;
                 _accessToken = null;
@@ -132,9 +135,9 @@ namespace WingandPrayer.MazdaApi
             {
                 if (needsKeys && (string.IsNullOrEmpty(_encKey) || string.IsNullOrEmpty(_signKey)))
                 {
-                    _logger.LogDebug("Retrieving encryption keys");
+                    _logger?.LogDebug("Retrieving encryption keys");
                     CheckVersionResponse checkVersionResponse = JsonSerializer.Deserialize<CheckVersionResponse>(await SendApiRequestAsync(HttpMethod.Post, "/service/checkVersion", null, false, false), new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
-                    _logger.LogDebug("Successfully retrieved encryption keys");
+                    _logger?.LogDebug("Successfully retrieved encryption keys");
                     _encKey = checkVersionResponse?.EncKey;
                     _signKey = checkVersionResponse?.SignKey;
                 }
@@ -143,19 +146,19 @@ namespace WingandPrayer.MazdaApi
                 {
                     if (!string.IsNullOrWhiteSpace(_accessToken) && DateTime.Now - new TimeSpan(0, 0, 1, 0) > _accessTokenExpirationTs)
                     {
-                        _logger.LogDebug("Access token is expired.Fetching a new one.");
+                        _logger?.LogDebug("Access token is expired.Fetching a new one.");
                        _accessToken = null;
                         _accessTokenExpirationTs = DateTime.MinValue;
                     }
 
                     if (string.IsNullOrWhiteSpace(_accessToken))
                     {
-                        _logger.LogDebug("No access token present. Logging in.");
+                        _logger?.LogDebug("No access token present. Logging in.");
                         await LoginAsync();
                     }
                 }
 
-                _logger.LogTrace($"Sending {method} request to {uri}{(numRetries == 0 ? string.Empty : $" - attempt {numRetries + 1}")}{(string.IsNullOrWhiteSpace(body) ? string.Empty : $"\n\rBody: {body}")}");
+                _logger?.LogTrace($"Sending {method} request to {uri}{(numRetries == 0 ? string.Empty : $" - attempt {numRetries + 1}")}{(string.IsNullOrWhiteSpace(body) ? string.Empty : $"\n\rBody: {body}")}");
 
                 try
                 {
@@ -163,7 +166,7 @@ namespace WingandPrayer.MazdaApi
                 }
                 catch (MazdaApiEncryptionException)
                 {
-                    _logger.LogWarning("Server reports request was not encrypted properly. Retrieving new encryption keys.");
+                    _logger?.LogWarning("Server reports request was not encrypted properly. Retrieving new encryption keys.");
                     CheckVersionResponse checkVersionResponse = JsonSerializer.Deserialize<CheckVersionResponse>(await SendApiRequestAsync(HttpMethod.Post, "/service/checkVersion", null, false, false), new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
                     _encKey = checkVersionResponse?.EncKey;
                     _signKey = checkVersionResponse?.SignKey;
@@ -171,25 +174,25 @@ namespace WingandPrayer.MazdaApi
                 }
                 catch (MazdaApiTokenExpiredException)
                 {
-                    _logger.LogDebug("Server reports access token was expired. Retrieving new access token.");
+                    _logger?.LogDebug("Server reports access token was expired. Retrieving new access token.");
                     await LoginAsync();
                     return await SendApiRequestAsync(method, uri, body, needsKeys, needsAuth, numRetries + 1);
                 }
                 catch (MazdaApiLoginFailedException)
                 {
-                    _logger.LogDebug("Login failed for an unknown reason. Trying again.");
+                    _logger?.LogDebug("Login failed for an unknown reason. Trying again.");
                     await LoginAsync();
                     return await SendApiRequestAsync(method, uri, body, needsKeys, needsAuth, numRetries + 1);
                 }
                 catch (MazdaApiRequestInProgressException)
                 {
-                    _logger.LogDebug("Request failed because another request was already in progress. Waiting 30 seconds and trying again.");
+                    _logger?.LogDebug("Request failed because another request was already in progress. Waiting 30 seconds and trying again.");
                     await Task.Delay(30 * 1000);
                     return await SendApiRequestAsync(method, uri, body, needsKeys, needsAuth, numRetries + 1);
                 }
             }
 
-            _logger.LogDebug("Request exceeded max number of retries");
+            _logger?.LogDebug("Request exceeded max number of retries");
             throw new MazdaApiException("Request exceeded max number of retries");
         }
 
@@ -201,9 +204,8 @@ namespace WingandPrayer.MazdaApi
 
             if (!string.IsNullOrWhiteSpace(body)) encryptedBody = CryptoUtils.EncryptPayloadUsingKey(body, _encKey, Iv);
 
-            using HttpClient httpClient = new HttpClient();
+            _httpClient.DefaultRequestHeaders.Clear();
 
-            httpClient.DefaultRequestHeaders.Clear();
             using (HttpRequestMessage request = new HttpRequestMessage { RequestUri = new Uri(_regionConfig.BaseUrl + uri), Method = method, Content = new StringContent(encryptedBody) })
             {
                 request.Headers.Add("device-id", _baseApiDeviceId);
@@ -223,7 +225,7 @@ namespace WingandPrayer.MazdaApi
                     request.Headers.Add("sign", GetSignFromPayloadAndTimestamp("", timestamp));
                 else if (method == HttpMethod.Post) request.Headers.Add("sign", GetSignFromPayloadAndTimestamp(body, timestamp));
 
-                HttpResponseMessage apiResponseMessage = await httpClient.SendAsync(request);
+                HttpResponseMessage apiResponseMessage = await _httpClient.SendAsync(request);
 
                 apiResponse = JsonSerializer.Deserialize(await apiResponseMessage.Content.ReadAsByteArrayAsync(), typeof(ApiResponse), new JsonSerializerOptions { PropertyNameCaseInsensitive = true }) as ApiResponse;
             }
@@ -244,7 +246,7 @@ namespace WingandPrayer.MazdaApi
 
                 string payload = CryptoUtils.DecryptPayloadUsingKey(apiResponse.Payload, key, Iv);
 
-                _logger.LogTrace($"Payload received: {payload}");
+                _logger?.LogTrace($"Payload received: {payload}");
 
                 return payload;
             }
@@ -271,8 +273,8 @@ namespace WingandPrayer.MazdaApi
 
         private async Task LoginAsync()
         {
-            using HttpClient httpClient = new HttpClient();
-            httpClient.DefaultRequestHeaders.Add("User-Agent", UserAgentUsherApi);
+            _httpClient.DefaultRequestHeaders.Clear();
+            _httpClient.DefaultRequestHeaders.Add("User-Agent", UserAgentUsherApi);
             UriBuilder builder = new UriBuilder(_regionConfig.UsherUrl);
             builder.Path += @"/system/encryptionKey";
             NameValueCollection query = HttpUtility.ParseQueryString(builder.Query);
@@ -281,11 +283,11 @@ namespace WingandPrayer.MazdaApi
             query["deviceId"] = _usherApiDeviceId;
             query["sdkVersion"] = UsherSdkVersion;
             builder.Query = query.ToString()!;
-            HttpResponseMessage response = await httpClient.GetAsync(builder.ToString());
+            HttpResponseMessage response = await _httpClient.GetAsync(builder.ToString());
             EncryptionKeyResponse encryptionKey = JsonSerializer.Deserialize(await response.Content.ReadAsByteArrayAsync(), typeof(EncryptionKeyResponse), new JsonSerializerOptions { PropertyNameCaseInsensitive = true }) as EncryptionKeyResponse;
 
-            _logger.LogDebug($"Logging in as {_emailAddress}");
-            _logger.LogDebug("Retrieving public key to encrypt password");
+            _logger?.LogDebug($"Logging in as {_emailAddress}");
+            _logger?.LogDebug("Retrieving public key to encrypt password");
 
             using (RSA rsa = CryptoUtils.CreateRsaFromDerData(Convert.FromBase64String(encryptionKey!.Data.PublicKey)))
             {
@@ -301,31 +303,31 @@ namespace WingandPrayer.MazdaApi
                     UserId = _emailAddress,
                     UserIdType = "email"
                 }), Encoding.UTF8, "application/json");
-                response = await httpClient.PostAsync(builder.ToString(), content);
+                response = await _httpClient.PostAsync(builder.ToString(), content);
             }
 
-            _logger.LogDebug("Sending login request");
+            _logger?.LogDebug("Sending login request");
 
             LoginResponse loginResponse = JsonSerializer.Deserialize(await response.Content.ReadAsByteArrayAsync(), typeof(LoginResponse), new JsonSerializerOptions { PropertyNameCaseInsensitive = true }) as LoginResponse;
 
             switch (loginResponse?.Status ?? string.Empty)
             {
                 case "OK":
-                    _logger.LogDebug($"Successfully logged in as {_emailAddress}");
+                    _logger?.LogDebug($"Successfully logged in as {_emailAddress}");
                     _accessToken = loginResponse!.Data.AccessToken;
                     _accessTokenExpirationTs = DateTimeOffset.FromUnixTimeSeconds(loginResponse!.Data.AccessTokenExpirationTs).DateTime;
                     break;
 
                 case "INVALID_CREDENTIAL":
-                    _logger.LogDebug("Login failed due to invalid email or password");
+                    _logger?.LogDebug("Login failed due to invalid email or password");
                     throw new MazdaApiAuthenticationException("Invalid email or password");
 
                 case "USER_LOCKED":
-                    _logger.LogDebug("Login failed to account being locked");
+                    _logger?.LogDebug("Login failed to account being locked");
                     throw new MazdaApiAccountLockedException("Login failed to account being locked");
 
                 default:
-                    _logger.LogDebug($"Login failed{(string.IsNullOrWhiteSpace(loginResponse?.Status) ? string.Empty : $":{loginResponse.Status}")}");
+                    _logger?.LogDebug($"Login failed{(string.IsNullOrWhiteSpace(loginResponse?.Status) ? string.Empty : $":{loginResponse.Status}")}");
                     throw new MazdaApiLoginFailedException("Login failed");
             }
         }
