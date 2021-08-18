@@ -83,6 +83,34 @@ namespace WingandPrayer.MazdaApi
         }
 
         /// <summary>
+        /// Update the HVAC settings for a given vehicle.
+        /// </summary>
+        /// <param name="internalVin">The internal vehicle identity number for the vehicle which can be found with calls to methods that return vehicles</param>
+        /// <param name="hvacSettings">An HvacSetting object containing the values to be updated</param>
+        public void SetHvacSettings(string internalVin, HvacSettings hvacSettings) => SetHvacSettingsAsync(internalVin, hvacSettings).Wait();
+
+        /// <summary>
+        /// Update the HVAC settings for a given vehicle asynchronously.
+        /// </summary>
+        /// <param name="internalVin">The internal vehicle identity number for the vehicle which can be found with calls to methods that return vehicles</param>
+        /// <param name="hvacSettings">An HvacSetting object containing the values to be updated</param>
+        public Task SetHvacSettingsAsync(string internalVin, HvacSettings hvacSettings) => _controller.SetHvacSettingsAsync(internalVin, hvacSettings);
+
+        /// <summary>
+        /// Get the HVAC settings for a given vehicle asynchronously.
+        /// </summary>
+        /// <param name="internalVin">The internal vehicle identity number for the vehicle which can be found with calls to methods that return vehicles</param>
+        /// <returns>An HvacSettings object containing the HVAC settings</returns>
+        public HvacSettings GetHvacSettings(string internalVin) => GetHvacSettingsAsync(internalVin).GetAwaiter().GetResult();
+
+        /// <summary>
+        /// Get the HVAC settings for a given vehicle asynchronously.
+        /// </summary>
+        /// <param name="internalVin">The internal vehicle identity number for the vehicle which can be found with calls to methods that return vehicles</param>
+        /// <returns>An HvacSettings object containing the HVAC settings</returns>
+        public Task<HvacSettings> GetHvacSettingsAsync(string internalVin) => _controller.GetHvacSettingsAsync(internalVin);
+
+        /// <summary>
         /// Get the remote permissions for a given vehicle.
         /// </summary>
         /// <param name="vin">The vehicle identity number fo the vehicle</param>

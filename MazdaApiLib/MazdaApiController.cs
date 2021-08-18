@@ -74,6 +74,25 @@ namespace WingandPrayer.MazdaApi
             throw new MazdaApiException("Failed to get vehicle status");
         }
 
+        public async Task SetHvacSettingsAsync(string internalVin, HvacSettings hvacSettings)
+        {
+            ApiResult result = JsonConvert.DeserializeObject<ApiResult>(await _connection.ApiRequestAsync(HttpMethod.Post, "/remoteServices/updateHVACSetting/v4", $"{{\"internaluserid\": \"__INTERNAL_ID__\", \"internalvin\": {internalVin}, \"hvacsettings\": {JsonConvert.SerializeObject(hvacSettings)}}}", true, true));
+
+            if ((result?.ResultCode ?? string.Empty) != "200S00")
+            {
+                throw new MazdaApiException("Failed to update hvac settings");
+            }
+        }
+
+        public async Task<HvacSettings> GetHvacSettingsAsync(string vin)
+        {
+            ApiResult result = JsonConvert.DeserializeObject<ApiResult>(await _connection.ApiRequestAsync(HttpMethod.Post, "/remoteServices/getHVACSetting/v4", $"{{\"internaluserid\": \"__INTERNAL_ID__\", \"vin\": \"{vin}\"}}", true, true));
+
+            if ((result?.ResultCode ?? string.Empty) == "200S00") return result?.HvacSettings;
+
+            throw new MazdaApiException("Failed to get hvac settings");
+        }
+
         public async Task<string> GetRemotePermissionsAsync(string vin)
         {
             ApiResult result = JsonConvert.DeserializeObject<ApiResult>(await _connection.ApiRequestAsync(HttpMethod.Post, "/remoteServices/getRemoteControlPermission/v4", $"{{\"internaluserid\": \"__INTERNAL_ID__\", \"vin\": \"{vin}\"}}", true, true));
@@ -124,6 +143,7 @@ namespace WingandPrayer.MazdaApi
         private class ApiResult
         {
             public string ResultCode { get; set; }
+            public HvacSettings HvacSettings { get; set; }
             public string AvailableService { get; set; }
             public string CarlineDesc { get; set; }
             public object RemoteControl { get; set; }

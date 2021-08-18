@@ -162,6 +162,40 @@ An EvVehicleStatus
 | ---- | ---- | ----------- |
 | internalVin | [System.String](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.String 'System.String') | The internal vehicle identity number for the vehicle which can be found with calls to methods that return vehicles |
 
+<a name='M-WingandPrayer-MazdaApi-MazdaApiClient-GetHvacSettings-System-String-'></a>
+### GetHvacSettings(internalVin) `method`
+
+##### Summary
+
+Get the HVAC settings for a given vehicle asynchronously.
+
+##### Returns
+
+An HvacSettings object containing the HVAC settings
+
+##### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| internalVin | [System.String](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.String 'System.String') | The internal vehicle identity number for the vehicle which can be found with calls to methods that return vehicles |
+
+<a name='M-WingandPrayer-MazdaApi-MazdaApiClient-GetHvacSettingsAsync-System-String-'></a>
+### GetHvacSettingsAsync(internalVin) `method`
+
+##### Summary
+
+Get the HVAC settings for a given vehicle asynchronously.
+
+##### Returns
+
+An HvacSettings object containing the HVAC settings
+
+##### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| internalVin | [System.String](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.String 'System.String') | The internal vehicle identity number for the vehicle which can be found with calls to methods that return vehicles |
+
 <a name='M-WingandPrayer-MazdaApi-MazdaApiClient-GetRawVehicleStatus-System-String-'></a>
 ### GetRawVehicleStatus(internalVin) `method`
 
@@ -357,6 +391,34 @@ Locks the doors of the vehicle asynchronously.
 | Name | Type | Description |
 | ---- | ---- | ----------- |
 | internalVin | [System.String](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.String 'System.String') | The internal vehicle identity number for the vehicle which can be found with calls to methods that return vehicles |
+
+<a name='M-WingandPrayer-MazdaApi-MazdaApiClient-SetHvacSettings-System-String,WingandPrayer-MazdaApi-Model-HvacSettings-'></a>
+### SetHvacSettings(internalVin,hvacSettings) `method`
+
+##### Summary
+
+Update the HVAC settings for a given vehicle.
+
+##### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| internalVin | [System.String](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.String 'System.String') | The internal vehicle identity number for the vehicle which can be found with calls to methods that return vehicles |
+| hvacSettings | [WingandPrayer.MazdaApi.Model.HvacSettings](#T-WingandPrayer-MazdaApi-Model-HvacSettings 'WingandPrayer.MazdaApi.Model.HvacSettings') | An HvacSetting object containing the values to be updated |
+
+<a name='M-WingandPrayer-MazdaApi-MazdaApiClient-SetHvacSettingsAsync-System-String,WingandPrayer-MazdaApi-Model-HvacSettings-'></a>
+### SetHvacSettingsAsync(internalVin,hvacSettings) `method`
+
+##### Summary
+
+Update the HVAC settings for a given vehicle asynchronously.
+
+##### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| internalVin | [System.String](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.String 'System.String') | The internal vehicle identity number for the vehicle which can be found with calls to methods that return vehicles |
+| hvacSettings | [WingandPrayer.MazdaApi.Model.HvacSettings](#T-WingandPrayer-MazdaApi-Model-HvacSettings 'WingandPrayer.MazdaApi.Model.HvacSettings') | An HvacSetting object containing the values to be updated |
 
 <a name='M-WingandPrayer-MazdaApi-MazdaApiClient-TurnOffHazzardLights-System-String-'></a>
 ### TurnOffHazzardLights(internalVin) `method`
