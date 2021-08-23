@@ -85,33 +85,31 @@
             <param name="useCachedVehicleList">A flag that when set to true caches calls to methods that return vehicles. (Optional, defaults to false)</param>
             <param name="logger">An ILogger that can be used for debugging and tracing purposes. (Optional, defaults to null)</param>
         </member>
-        <member name="M:WingandPrayer.MazdaApi.MazdaApiClient.SetHvacSettings(System.String,WingandPrayer.MazdaApi.Model.HvacSettings)">
+        <member name="M:WingandPrayer.MazdaApi.MazdaApiClient.FindVehicleLocation(System.String)">
             <summary>
-            Update the HVAC settings for a given vehicle.
+            Find the current Lattitude and Longitude of the vehicle.
             </summary>
             <param name="internalVin">The internal vehicle identity number for the vehicle which can be found with calls to methods that return vehicles</param>
-            <param name="hvacSettings">An HvacSetting object containing the values to be updated</param>
+            <returns>A VehicleLocation object containing the last known location of the vehicle and a timestamp</returns>
         </member>
-        <member name="M:WingandPrayer.MazdaApi.MazdaApiClient.SetHvacSettingsAsync(System.String,WingandPrayer.MazdaApi.Model.HvacSettings)">
+        <member name="M:WingandPrayer.MazdaApi.MazdaApiClient.FindVehicleLocationAsync(System.String)">
             <summary>
-            Update the HVAC settings for a given vehicle asynchronously.
+            Find the current Lattitude and Longitude of the vehicle asynchronously.
             </summary>
             <param name="internalVin">The internal vehicle identity number for the vehicle which can be found with calls to methods that return vehicles</param>
-            <param name="hvacSettings">An HvacSetting object containing the values to be updated</param>
+            <returns>A VehicleLocation object containing the last known location of the vehicle and a timestamp</returns>
         </member>
-        <member name="M:WingandPrayer.MazdaApi.MazdaApiClient.GetHvacSettings(System.String)">
+        <member name="M:WingandPrayer.MazdaApi.MazdaApiClient.ActivateRealTimeVehicleStatus(System.String)">
             <summary>
-            Get the HVAC settings for a given vehicle asynchronously.
+            Activate realtime vehicle status reporting for the given vehicle
             </summary>
             <param name="internalVin">The internal vehicle identity number for the vehicle which can be found with calls to methods that return vehicles</param>
-            <returns>An HvacSettings object containing the HVAC settings</returns>
         </member>
-        <member name="M:WingandPrayer.MazdaApi.MazdaApiClient.GetHvacSettingsAsync(System.String)">
+        <member name="M:WingandPrayer.MazdaApi.MazdaApiClient.ActivateRealTimeVehicleStatusAsync(System.String)">
             <summary>
-            Get the HVAC settings for a given vehicle asynchronously.
+            Activate realtime vehicle status reporting for the given vehicle asynchronously.
             </summary>
             <param name="internalVin">The internal vehicle identity number for the vehicle which can be found with calls to methods that return vehicles</param>
-            <returns>An HvacSettings object containing the HVAC settings</returns>
         </member>
         <member name="M:WingandPrayer.MazdaApi.MazdaApiClient.GetRemotePermissions(System.String)">
             <summary>
@@ -164,6 +162,58 @@
             Turns off the vehicle hazard lights asynchronously.
             </summary>
             <param name="internalVin">The internal vehicle identity number for the vehicle which can be found with calls to methods that return vehicles</param>
+        </member>
+        <member name="M:WingandPrayer.MazdaApi.MazdaApiClient.TurnOnHvac(System.String)">
+            <summary>
+            Turn on the Hvac for a given vehicle.
+            </summary>
+            <param name="internalVin">The internal vehicle identity number for the vehicle which can be found with calls to methods that return vehicles</param>
+        </member>
+        <member name="M:WingandPrayer.MazdaApi.MazdaApiClient.TurnOffHvac(System.String)">
+            <summary>
+            Turn off the Hvac for a given vehicle.
+            </summary>
+            <param name="internalVin">The internal vehicle identity number for the vehicle which can be found with calls to methods that return vehicles</param>
+        </member>
+        <member name="M:WingandPrayer.MazdaApi.MazdaApiClient.TurnOnHvacAsync(System.String)">
+            <summary>
+            Turn on the Hvac for a given vehicle asynchronously.
+            </summary>
+            <param name="internalVin">The internal vehicle identity number for the vehicle which can be found with calls to methods that return vehicles</param>
+        </member>
+        <member name="M:WingandPrayer.MazdaApi.MazdaApiClient.TurnOffHvacAsync(System.String)">
+            <summary>
+            Turn off the Hvac for a given vehicle asynchronously.
+            </summary>
+            <param name="internalVin">The internal vehicle identity number for the vehicle which can be found with calls to methods that return vehicles</param>
+        </member>
+        <member name="M:WingandPrayer.MazdaApi.MazdaApiClient.SetHvacSettings(System.String,WingandPrayer.MazdaApi.Model.HvacSettings)">
+            <summary>
+            Update the HVAC settings for a given vehicle.
+            </summary>
+            <param name="internalVin">The internal vehicle identity number for the vehicle which can be found with calls to methods that return vehicles</param>
+            <param name="hvacSettings">An HvacSetting object containing the values to be updated</param>
+        </member>
+        <member name="M:WingandPrayer.MazdaApi.MazdaApiClient.SetHvacSettingsAsync(System.String,WingandPrayer.MazdaApi.Model.HvacSettings)">
+            <summary>
+            Update the HVAC settings for a given vehicle asynchronously.
+            </summary>
+            <param name="internalVin">The internal vehicle identity number for the vehicle which can be found with calls to methods that return vehicles</param>
+            <param name="hvacSettings">An HvacSetting object containing the values to be updated</param>
+        </member>
+        <member name="M:WingandPrayer.MazdaApi.MazdaApiClient.GetHvacSettings(System.String)">
+            <summary>
+            Get the HVAC settings for a given vehicle asynchronously.
+            </summary>
+            <param name="internalVin">The internal vehicle identity number for the vehicle which can be found with calls to methods that return vehicles</param>
+            <returns>An HvacSettings object containing the HVAC settings</returns>
+        </member>
+        <member name="M:WingandPrayer.MazdaApi.MazdaApiClient.GetHvacSettingsAsync(System.String)">
+            <summary>
+            Get the HVAC settings for a given vehicle asynchronously.
+            </summary>
+            <param name="internalVin">The internal vehicle identity number for the vehicle which can be found with calls to methods that return vehicles</param>
+            <returns>An HvacSettings object containing the HVAC settings</returns>
         </member>
         <member name="M:WingandPrayer.MazdaApi.MazdaApiClient.GetAssumedLockState(System.String)">
             <summary>

@@ -35,6 +35,7 @@ using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using WingandPrayer.MazdaApi.Exceptions;
 using WingandPrayer.MazdaApi.Model;
+using WingandPrayer.MazdaApi.RawModel;
 
 namespace WingandPrayer.MazdaApi
 {
@@ -49,6 +50,28 @@ namespace WingandPrayer.MazdaApi
             ApiResult result = JsonConvert.DeserializeObject<ApiResult>(json);
 
             return (result?.ResultCode ?? string.Empty) == "200S00";
+        }
+
+        public async Task<FindVehicleLocationResponse> FindVehicleLocationAsync(string internalVin)
+        {
+            FindVehicleLocationResponse result = JsonConvert.DeserializeObject<FindVehicleLocationResponse>(await _connection.ApiRequestAsync(HttpMethod.Post, "/remoteServices/findVehicleLocation/v4", $"{{\"internaluserid\": \"__INTERNAL_ID__\", \"internalvin\": {internalVin}}}", true, true));
+
+            if ((result?.ResultCode ?? string.Empty) != "200S00")
+            {
+                throw new MazdaApiException("Failed to get Vehicle Location");
+            }
+
+            return result;
+        }
+
+        public async Task ActivateRealTimeVehicleStatusAsync(string internalVin)
+        {
+            ApiResult result = JsonConvert.DeserializeObject<ApiResult>(await _connection.ApiRequestAsync(HttpMethod.Post, "/remoteServices/activeRealTimeVehicleStatus/v4", $"{{\"internaluserid\": \"__INTERNAL_ID__\", \"internalvin\": {internalVin}}}", true, true));
+
+            if ((result?.ResultCode ?? string.Empty) != "200S00")
+            {
+                throw new MazdaApiException("Failed to activate realtime vehicle status");
+            }
         }
 
         public async Task<string> GetVehicleBaseInformationAsync() => await _connection.ApiRequestAsync(HttpMethod.Post, "/remoteServices/getVecBaseInfos/v4", new Dictionary<string, string> { { "internaluserid", "__INTERNAL_ID__" } }, true, true);
@@ -116,6 +139,13 @@ namespace WingandPrayer.MazdaApi
             ApiResult result = JsonConvert.DeserializeObject<ApiResult>(await _connection.ApiRequestAsync(HttpMethod.Post, $"/remoteServices/{(blnLightOn ? "lightOn" : "lightOff")}/v4", $"{{\"internaluserid\": \"__INTERNAL_ID__\", \"internalvin\": {internalVin}}}", true, true));
 
             if ((result?.ResultCode ?? string.Empty) != "200S00") throw new MazdaApiException($"Failed to turn light {(blnLightOn ? "on" : "off")}");
+        }
+
+        public async Task SetHvacAsync(string internalVin, bool blnOn)
+        {
+            ApiResult result = JsonConvert.DeserializeObject<ApiResult>(await _connection.ApiRequestAsync(HttpMethod.Post, $"/remoteServices/{(blnOn ? "hvacOn" : "hvacOff")}/v4", $"{{\"internaluserid\": \"__INTERNAL_ID__\", \"internalvin\": {internalVin}}}", true, true));
+
+            if ((result?.ResultCode ?? string.Empty) != "200S00") throw new MazdaApiException($"Failed to set Hvac status to {(blnOn ? "On" : "Off")}");
         }
 
         public async Task SetDoorLockAsync(string internalVin, bool blnLock)

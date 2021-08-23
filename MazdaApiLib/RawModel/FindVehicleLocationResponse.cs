@@ -1,5 +1,5 @@
 ﻿// 
-// Converters.cs
+// FindVehicleLocationResponse.cs
 // 
 // MIT License
 // 
@@ -26,21 +26,25 @@
 
 using System;
 using Newtonsoft.Json;
-using Newtonsoft.Json.Converters;
+using WingandPrayer.MazdaApi.Model;
 
-namespace WingandPrayer.MazdaApi.Model
+namespace WingandPrayer.MazdaApi.RawModel
 {
-    public class BoolConverter : JsonConverter
+    internal class FindVehicleLocationResponse
     {
-        public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer) => writer.WriteValue((bool)value ? 1 : 0);
+        public string ResultCode { get; set; }
 
-        public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer) => reader.Value!.ToString() == "1";
+        [JsonConverter(typeof(StampDateTimeConverter))]
+        public DateTime AcquisitionDatetime { get; set; }
 
-        public override bool CanConvert(Type objectType) => objectType == typeof(bool);
-    }
+        public double Latitude { get; set; }
 
-    internal class StampDateTimeConverter : IsoDateTimeConverter
-    {
-        public StampDateTimeConverter() => DateTimeFormat = "yyyyMMddHHmmss";
+        public double Longitude { get; set; }
+
+        [JsonConverter(typeof(BoolConverter))]
+        public bool LatitudeFlag { get; set; }
+
+        [JsonConverter(typeof(BoolConverter))]
+        public bool LongitudeFlag { get; set; }
     }
 }

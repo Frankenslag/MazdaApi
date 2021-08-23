@@ -72,6 +72,66 @@ Constructs an instance of the MazdaApiClient that is used to access all the publ
 | useCachedVehicleList | [System.Boolean](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Boolean 'System.Boolean') | A flag that when set to true caches calls to methods that return vehicles. (Optional, defaults to false) |
 | logger | [Microsoft.Extensions.Logging.ILogger{WingandPrayer.MazdaApi.MazdaApiClient}](#T-Microsoft-Extensions-Logging-ILogger{WingandPrayer-MazdaApi-MazdaApiClient} 'Microsoft.Extensions.Logging.ILogger{WingandPrayer.MazdaApi.MazdaApiClient}') | An ILogger that can be used for debugging and tracing purposes. (Optional, defaults to null) |
 
+<a name='M-WingandPrayer-MazdaApi-MazdaApiClient-ActivateRealTimeVehicleStatus-System-String-'></a>
+### ActivateRealTimeVehicleStatus(internalVin) `method`
+
+##### Summary
+
+Activate realtime vehicle status reporting for the given vehicle
+
+##### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| internalVin | [System.String](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.String 'System.String') | The internal vehicle identity number for the vehicle which can be found with calls to methods that return vehicles |
+
+<a name='M-WingandPrayer-MazdaApi-MazdaApiClient-ActivateRealTimeVehicleStatusAsync-System-String-'></a>
+### ActivateRealTimeVehicleStatusAsync(internalVin) `method`
+
+##### Summary
+
+Activate realtime vehicle status reporting for the given vehicle asynchronously.
+
+##### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| internalVin | [System.String](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.String 'System.String') | The internal vehicle identity number for the vehicle which can be found with calls to methods that return vehicles |
+
+<a name='M-WingandPrayer-MazdaApi-MazdaApiClient-FindVehicleLocation-System-String-'></a>
+### FindVehicleLocation(internalVin) `method`
+
+##### Summary
+
+Find the current Lattitude and Longitude of the vehicle.
+
+##### Returns
+
+A VehicleLocation object containing the last known location of the vehicle and a timestamp
+
+##### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| internalVin | [System.String](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.String 'System.String') | The internal vehicle identity number for the vehicle which can be found with calls to methods that return vehicles |
+
+<a name='M-WingandPrayer-MazdaApi-MazdaApiClient-FindVehicleLocationAsync-System-String-'></a>
+### FindVehicleLocationAsync(internalVin) `method`
+
+##### Summary
+
+Find the current Lattitude and Longitude of the vehicle asynchronously.
+
+##### Returns
+
+A VehicleLocation object containing the last known location of the vehicle and a timestamp
+
+##### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| internalVin | [System.String](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.String 'System.String') | The internal vehicle identity number for the vehicle which can be found with calls to methods that return vehicles |
+
 <a name='M-WingandPrayer-MazdaApi-MazdaApiClient-GetAssumedLockState-System-String-'></a>
 ### GetAssumedLockState(internalVin) `method`
 
@@ -446,6 +506,32 @@ Turns off the vehicle hazard lights asynchronously.
 | ---- | ---- | ----------- |
 | internalVin | [System.String](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.String 'System.String') | The internal vehicle identity number for the vehicle which can be found with calls to methods that return vehicles |
 
+<a name='M-WingandPrayer-MazdaApi-MazdaApiClient-TurnOffHvac-System-String-'></a>
+### TurnOffHvac(internalVin) `method`
+
+##### Summary
+
+Turn off the Hvac for a given vehicle.
+
+##### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| internalVin | [System.String](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.String 'System.String') | The internal vehicle identity number for the vehicle which can be found with calls to methods that return vehicles |
+
+<a name='M-WingandPrayer-MazdaApi-MazdaApiClient-TurnOffHvacAsync-System-String-'></a>
+### TurnOffHvacAsync(internalVin) `method`
+
+##### Summary
+
+Turn off the Hvac for a given vehicle asynchronously.
+
+##### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| internalVin | [System.String](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.String 'System.String') | The internal vehicle identity number for the vehicle which can be found with calls to methods that return vehicles |
+
 <a name='M-WingandPrayer-MazdaApi-MazdaApiClient-TurnOnHazzardLights-System-String-'></a>
 ### TurnOnHazzardLights(internalVin) `method`
 
@@ -465,6 +551,32 @@ Turns on the vehicle hazard lights.
 ##### Summary
 
 Turns on the vehicle hazard lights asynchronously.
+
+##### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| internalVin | [System.String](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.String 'System.String') | The internal vehicle identity number for the vehicle which can be found with calls to methods that return vehicles |
+
+<a name='M-WingandPrayer-MazdaApi-MazdaApiClient-TurnOnHvac-System-String-'></a>
+### TurnOnHvac(internalVin) `method`
+
+##### Summary
+
+Turn on the Hvac for a given vehicle.
+
+##### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| internalVin | [System.String](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.String 'System.String') | The internal vehicle identity number for the vehicle which can be found with calls to methods that return vehicles |
+
+<a name='M-WingandPrayer-MazdaApi-MazdaApiClient-TurnOnHvacAsync-System-String-'></a>
+### TurnOnHvacAsync(internalVin) `method`
+
+##### Summary
+
+Turn on the Hvac for a given vehicle asynchronously.
 
 ##### Parameters
 

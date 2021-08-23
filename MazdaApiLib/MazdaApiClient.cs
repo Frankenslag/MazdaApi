@@ -24,12 +24,14 @@
 // SOFTWARE.
 // 
 
+using System;
 using System.Net.Http;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using WingandPrayer.MazdaApi.Exceptions;
 using WingandPrayer.MazdaApi.Model;
+using WingandPrayer.MazdaApi.RawModel;
 
 // ReSharper disable UnusedMember.Global
 
@@ -83,33 +85,36 @@ namespace WingandPrayer.MazdaApi
         }
 
         /// <summary>
-        /// Update the HVAC settings for a given vehicle.
+        /// Find the current Lattitude and Longitude of the vehicle.
         /// </summary>
         /// <param name="internalVin">The internal vehicle identity number for the vehicle which can be found with calls to methods that return vehicles</param>
-        /// <param name="hvacSettings">An HvacSetting object containing the values to be updated</param>
-        public void SetHvacSettings(string internalVin, HvacSettings hvacSettings) => SetHvacSettingsAsync(internalVin, hvacSettings).Wait();
+        /// <returns>A VehicleLocation object containing the last known location of the vehicle and a timestamp</returns>
+        public VehicleLocation FindVehicleLocation(string internalVin) => FindVehicleLocationAsync(internalVin).GetAwaiter().GetResult();
 
         /// <summary>
-        /// Update the HVAC settings for a given vehicle asynchronously.
+        /// Find the current Lattitude and Longitude of the vehicle asynchronously.
         /// </summary>
         /// <param name="internalVin">The internal vehicle identity number for the vehicle which can be found with calls to methods that return vehicles</param>
-        /// <param name="hvacSettings">An HvacSetting object containing the values to be updated</param>
-        public Task SetHvacSettingsAsync(string internalVin, HvacSettings hvacSettings) => _controller.SetHvacSettingsAsync(internalVin, hvacSettings);
+        /// <returns>A VehicleLocation object containing the last known location of the vehicle and a timestamp</returns>
+        public async Task<VehicleLocation> FindVehicleLocationAsync(string internalVin)
+        {
+            FindVehicleLocationResponse location = await _controller.FindVehicleLocationAsync(internalVin);
+
+            return new VehicleLocation { AcquisitionDatetime = location.AcquisitionDatetime, Latitude = Math.Abs(location.Latitude) * (location.LatitudeFlag ? -1 : 1), Longitude = Math.Abs(location.Longitude) * (location.LongitudeFlag ? 1 : -1)};
+        }
 
         /// <summary>
-        /// Get the HVAC settings for a given vehicle asynchronously.
+        /// Activate realtime vehicle status reporting for the given vehicle
         /// </summary>
         /// <param name="internalVin">The internal vehicle identity number for the vehicle which can be found with calls to methods that return vehicles</param>
-        /// <returns>An HvacSettings object containing the HVAC settings</returns>
-        public HvacSettings GetHvacSettings(string internalVin) => GetHvacSettingsAsync(internalVin).GetAwaiter().GetResult();
+        public void ActivateRealTimeVehicleStatus(string internalVin) => ActivateRealTimeVehicleStatusAsync(internalVin).Wait();
 
         /// <summary>
-        /// Get the HVAC settings for a given vehicle asynchronously.
+        /// Activate realtime vehicle status reporting for the given vehicle asynchronously.
         /// </summary>
         /// <param name="internalVin">The internal vehicle identity number for the vehicle which can be found with calls to methods that return vehicles</param>
-        /// <returns>An HvacSettings object containing the HVAC settings</returns>
-        public Task<HvacSettings> GetHvacSettingsAsync(string internalVin) => _controller.GetHvacSettingsAsync(internalVin);
-
+        public Task ActivateRealTimeVehicleStatusAsync(string internalVin) => _controller.ActivateRealTimeVehicleStatusAsync(internalVin);
+ 
         /// <summary>
         /// Get the remote permissions for a given vehicle.
         /// </summary>

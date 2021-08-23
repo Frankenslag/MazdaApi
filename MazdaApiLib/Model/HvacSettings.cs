@@ -26,6 +26,8 @@
 
 using Newtonsoft.Json;
 
+// ReSharper disable UnusedMember.Global
+
 namespace WingandPrayer.MazdaApi.Model
 {
     public enum TemperatureType

@@ -87,8 +87,8 @@ namespace WingandPrayer.MazdaApi
             VehicleStatus retval = new VehicleStatus
             {
                 LastUpdatedTimestamp = alertInfo.OccurrenceDate,
-                Latitude = remoteInfo.PositionInfo.Latitude * (remoteInfo.PositionInfo.LatitudeFlag == 1 ? -1 : 1),
-                Longitude = remoteInfo.PositionInfo.Longitude * (remoteInfo.PositionInfo.LongitudeFlag == 1 ? 1 : -1),
+                Latitude = remoteInfo.PositionInfo.Latitude * (remoteInfo.PositionInfo.LatitudeFlag ? -1 : 1),
+                Longitude = remoteInfo.PositionInfo.Longitude * (remoteInfo.PositionInfo.LongitudeFlag ? 1 : -1),
                 PositionTimestamp = remoteInfo.PositionInfo.AcquisitionDatetime,
                 FuelRemainingPercent = remoteInfo.ResidualFuel.FuelSegementDActl,
                 FuelDistanceRemainingKm = remoteInfo.ResidualFuel.RemDrvDistDActlKm,

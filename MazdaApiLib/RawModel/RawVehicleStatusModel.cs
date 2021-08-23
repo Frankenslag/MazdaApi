@@ -27,7 +27,7 @@
 using System;
 using System.Collections.Generic;
 using Newtonsoft.Json;
-using Newtonsoft.Json.Converters;
+using WingandPrayer.MazdaApi.Model;
 
 // ReSharper disable UnusedMember.Global
 
@@ -64,8 +64,13 @@ namespace WingandPrayer.MazdaApi.RawModel
         public DateTime AcquisitionDatetime { get; set; }
 
         public double Latitude { get; set; }
-        public int LatitudeFlag { get; set; }
-        public int LongitudeFlag { get; set; }
+
+        [JsonConverter(typeof(BoolConverter))]
+        public bool LatitudeFlag { get; set; }
+
+        [JsonConverter(typeof(BoolConverter))]
+        public bool LongitudeFlag { get; set; }
+
         public double Longitude { get; set; }
     }
 
@@ -94,11 +99,6 @@ namespace WingandPrayer.MazdaApi.RawModel
         public int Gradient { get; set; }
         public int AcquisitionState { get; set; }
         public int MajorAxisError { get; set; }
-    }
-
-    internal class StampDateTimeConverter : IsoDateTimeConverter
-    {
-        public StampDateTimeConverter() => DateTimeFormat = "yyyyMMddHHmmss";
     }
 
     public class AlertInfo
