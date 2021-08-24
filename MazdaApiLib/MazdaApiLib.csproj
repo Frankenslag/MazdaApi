@@ -11,6 +11,12 @@
     <AssemblyVersion>0.4.1.0</AssemblyVersion>
     <FileVersion>0.4.1.0</FileVersion>
     <Version>0.4.1</Version>
+    <Description>This is an API client for the MyMazda (Mazda Connected Services) API. This is the API used by the MyMazda mobile app. This is a port of pymazda.</Description>
+    <Copyright>Wingandprayer Software 2021</Copyright>
+    <PackageProjectUrl>https://github.com/Frankenslag/MazdaApi</PackageProjectUrl>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <RepositoryUrl>https://github.com/Frankenslag/MazdaApi</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
@@ -34,6 +40,10 @@
 
   <ItemGroup>
     <None Include="..\LICENSE">
+      <Pack>True</Pack>
+      <PackagePath></PackagePath>
+    </None>
+    <None Include="..\README.md">
       <Pack>True</Pack>
       <PackagePath></PackagePath>
     </None>
