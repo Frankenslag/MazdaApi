@@ -53,11 +53,11 @@ namespace WingandPrayer.MazdaApi
         private const string AppOs = "Android";
         private const string Iv = "0102030405060708";
         private const string SignatureMd5 = "C383D8C4D279B78130AD52DC71D95CAA";
-        private const string AppVersion = "7.3.0";
+        private const string AppVersion = "8.1.1";
         private const string AppPackageId = "com.interrait.mymazda";
         private const string UsherSdkVersion = "11.2.0000.002";
-        private const string UserAgentBaseApi = "MyMazda-Android/7.3.0";
-        private const string UserAgentUsherApi = "MyMazda/7.3.0 (Google Pixel 3a; Android 11)";
+        private const string UserAgentBaseApi = "MyMazda-Android/8.1.1";
+        private const string UserAgentUsherApi = "MyMazda/8.1.1 (Google Pixel 3a; Android 11)";
         private const int MaxRetries = 4;
 
         private static readonly Dictionary<string, RegionConfig> RegionsConfigs = new Dictionary<string, RegionConfig>
